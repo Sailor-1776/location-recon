@@ -13,6 +13,7 @@ export const LocationRecordSchema = z.object({
 	longitude: z.number().nullable().optional(),
 	search_key: z.string().optional(),
 	department: z.string().optional().nullable(),
+	warning: z.string().optional().nullable(),
 });
 
 export type LocationRecord = z.infer<typeof LocationRecordSchema>;
@@ -108,6 +109,7 @@ export function fromRow(row: unknown): LocationRecord {
 	const stateRaw = pick(['state', 'State', 'State/Province']) ?? '';
 	const postalRaw = pick(['postal_code', 'zip', 'Zip', 'zip_code', 'Postal Code']) ?? '';
 	const departmentRaw = pick(['department', 'Department']) ?? null;
+	const warningRaw = pick(['warning', 'Warning']) ?? null;
 
 	const normalized: Record<string, unknown> = {
 		id: idRaw,
@@ -132,6 +134,7 @@ export function fromRow(row: unknown): LocationRecord {
 					: null,
 		search_key: pick(['search_key', 'searchKey', 'SearchKey', 'Search Key']) ?? null,
 		department: departmentRaw ? String(departmentRaw).trim() : null,
+		warning: warningRaw ? String(warningRaw).trim() : null,
 	};
 	return LocationRecordSchema.parse(normalized);
 }

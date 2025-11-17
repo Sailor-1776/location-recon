@@ -4,9 +4,10 @@ import { getDAO } from '../../../../../match/locationsDAO';
 import { loadConfig } from '../../../../../config';
 import { normalizeAddress } from '../../../../../normalize/address';
 import { reconcileOne } from '../../../../../match/matcher';
-import { canonicalKey } from '../../../../../types';
+import { canonicalKey, type LocationRecord } from '../../../../../types';
 import { getLogger } from '../../../../../utils/logger';
 import { isAddressExact, isNameExact } from '../../../../../match/scorers';
+import { extractWarningMessage } from '../../../../../llm/assistant';
 
 export const runtime = 'nodejs';
 
@@ -41,9 +42,26 @@ export async function POST(req: NextRequest) {
 	
 		const match = await reconcileOne(ca, dao);
 	
+		// Helper function to extract warning message for Non-Order departments
+		const extractWarningIfNeeded = async (record: LocationRecord | null | undefined): Promise<string | null> => {
+			if (!record) return null;
+			const departmentLower = (record.department || '').toString().trim().toLowerCase();
+			if (departmentLower !== 'non-order') return null;
+			
+			try {
+				return await extractWarningMessage(record);
+			} catch (e: any) {
+				logger.warn('Failed to extract warning message', { error: e?.message });
+				// Fallback to raw warning if LLM extraction fails
+				return record.warning || null;
+			}
+		};
+	
 		if (match.record) {
 			const name_exact = isNameExact(ca.name, match.record.name);
 			const address_exact = isAddressExact(ca, match.record);
+			const warningMessage = await extractWarningIfNeeded(match.record);
+			
 			// If fuzzy matching determined an EXACT match, return search_key regardless of strict equality.
 			if (match.status === 'EXACT') {
 				const key =
@@ -64,15 +82,18 @@ export async function POST(req: NextRequest) {
 					address_exact,
 					scores: match.scores,
 					department_match: match.scores.department,
+					warning: warningMessage,
 				});
 			}
 		}
-	
+		
+		const warningMessage = await extractWarningIfNeeded(match.record);
 		return NextResponse.json({
 			status: 'NEEDS_MORE_DATA',
 			message: 'Find additional Data',
 			diffs: match.diffs,
 			candidate: match.record ?? null,
+			warning: warningMessage,
 		});
 	} catch (e: any) {
 		logger.error('Lookup route failed', { message: e?.message });
