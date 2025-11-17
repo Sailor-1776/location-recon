@@ -220,13 +220,39 @@ export async function reconcileOne(doc: CanonicalAddress, dao: LocationsDAO): Pr
 	});
 	
 	const allCandidates = await dao.findCandidates(blockingKey);
-	
+
 	logger.info('Found candidates', {
 		candidatesCount: allCandidates.length,
 		sampleNames: allCandidates.slice(0, 5).map(c => c.name)
 	});
-	
-	// Step 1: Filter candidates by department first
+
+	// Step 1: Check for exact matches (name and address) FIRST, before department filtering
+	// Exact matches should always be returned regardless of department differences
+	for (const rec of allCandidates) {
+		const nameExact = isNameExact(doc.name, rec.name);
+		const addressExact = isAddressExact(doc, rec);
+
+		if (nameExact && addressExact) {
+			// Found exact match - return immediately (department doesn't matter for exact matches)
+			const scores = computeScores(doc, rec);
+			logger.info('Exact match found (before department filtering)', {
+				docName: doc.name,
+				recName: rec.name,
+				docDept: doc.department,
+				recDept: rec.department
+			});
+			return {
+				status: 'EXACT',
+				mr8_id: (rec.id as any) ?? null,
+				scores,
+				diffs: buildDiffs(doc, rec),
+				explanation: 'Exact match found.',
+				record: rec,
+			};
+		}
+	}
+
+	// Step 2: If no exact match found, filter candidates by department for fuzzy matching
 	// If doc has a department (non-empty), only consider records with matching department
 	// If doc has no department, consider all candidates
 	const docHasDepartment = doc.department && doc.department.toString().trim().length > 0;
@@ -242,33 +268,14 @@ export async function reconcileOne(doc: CanonicalAddress, dao: LocationsDAO): Pr
 			return matches;
 		})
 		: allCandidates;
-	
+
 	logger.info('After department filtering', {
 		docHasDepartment,
 		departmentFilteredCount: departmentFiltered.length,
 		filteredNames: departmentFiltered.slice(0, 5).map(c => ({ name: c.name, dept: c.department }))
 	});
 	
-	// Step 2: Check for exact matches (name and address) within department-filtered candidates
-	for (const rec of departmentFiltered) {
-		const nameExact = isNameExact(doc.name, rec.name);
-		const addressExact = isAddressExact(doc, rec);
-		
-		if (nameExact && addressExact) {
-			// Found exact match within department - return immediately
-			const scores = computeScores(doc, rec);
-			return {
-				status: 'EXACT',
-				mr8_id: (rec.id as any) ?? null,
-				scores,
-				diffs: buildDiffs(doc, rec),
-				explanation: 'Exact match found within department.',
-				record: rec,
-			};
-		}
-	}
-	
-	// Step 3: If no exact match found, proceed with scoring logic
+	// Step 3: If no exact match found, proceed with scoring logic for fuzzy matches
 	let best: { rec: LocationRecord; scores: MatchResult['scores'] } | null = null;
 
 	for (const rec of departmentFiltered) {

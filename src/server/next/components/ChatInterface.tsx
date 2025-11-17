@@ -123,7 +123,7 @@ export default function ChatInterface() {
 			
 			// Check if response is a PDF (single PDF file uploaded)
 			const contentType = res.headers.get('content-type');
-			if (contentType === 'application/pdf') {
+			if (contentType && contentType.toLowerCase().includes('application/pdf')) {
 				const blob = await res.blob();
 				const contentDisposition = res.headers.get('content-disposition');
 				const filenameMatch = contentDisposition?.match(/filename="(.+)"/);

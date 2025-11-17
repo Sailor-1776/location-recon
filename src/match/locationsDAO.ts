@@ -188,11 +188,22 @@ class CSVBackend implements LocationsDAO {
 	}): Promise<LocationRecord[]> {
 		const rows = await this.ensureLoaded();
 		if (blockingKey.postal_code) {
-			const zip5 = blockingKey.postal_code.slice(0, 5);
-			return rows.filter((r) => r.postal_code.slice(0, 5) === zip5);
+			const zip5 = blockingKey.postal_code.slice(0, 5).trim();
+			const postalMatches = rows.filter((r) => {
+				if (!r.postal_code || r.postal_code.trim() === '') return false;
+				return r.postal_code.slice(0, 5).trim() === zip5;
+			});
+			// If postal code matching found results, return them
+			if (postalMatches.length > 0) {
+				return postalMatches;
+			}
+			// Fall back to city/state if postal code match found nothing
+			// (handles cases where CSV has empty postal codes)
 		}
+		// Match by city and state
 		return rows.filter(
-			(r) => r.city.toLowerCase() === blockingKey.city.toLowerCase() && r.state === blockingKey.state,
+			(r) => r.city.toLowerCase().trim() === blockingKey.city.toLowerCase().trim() &&
+			        r.state.toUpperCase().trim() === blockingKey.state.toUpperCase().trim(),
 		);
 	}
 	async healthCheck(): Promise<{ ok: boolean; details: string }> {

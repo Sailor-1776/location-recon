@@ -142,15 +142,26 @@ export async function POST(req: NextRequest) {
 			}
 			
 			// Use structured facility extraction for PDFs, fallback to candidate blocks for other formats
-			const blocks = isPdf && text.trim()
+			let blocks = isPdf && text.trim()
 				? extractStructuredFacilities(text)
 				: extractCandidateBlocks(text);
+			// Fallback: if structured extraction finds nothing for PDFs, try candidate heuristics
+			if (isPdf && blocks.length === 0 && text.trim()) {
+				logger.warn('Structured facility extraction returned no blocks; falling back to candidate block extraction');
+				blocks = extractCandidateBlocks(text);
+			}
 
 			logger.info('Extracted blocks from file', {
 				fileName: f.name,
 				isPdf,
 				blocksCount: blocks.length,
-				textLength: text.length
+				textLength: text.length,
+				blocks: blocks.map((block, idx) => ({
+					index: idx + 1,
+					preview: block.substring(0, 200),
+					fullBlock: block,
+					lineCount: block.split(/\r?\n/).length
+				}))
 			});
 
 			// Debug: log extracted text content
@@ -254,19 +265,30 @@ export async function POST(req: NextRequest) {
 					// Only add blocks that have searchKey or warningMessage for annotation
 					if (search_key || warningMessage) {
 						logger.info('Adding block to PDF annotation', { 
-							block: block.substring(0, 100), 
+							blockIndex: blocks.indexOf(block) + 1,
+							totalBlocks: blocks.length,
+							block: block, // Full block text
+							blockPreview: block.substring(0, 150),
 							searchKey: search_key,
+							warningMessage: warningMessage,
 							hasWarning: !!warningMessage,
-							matchStatus: match.status 
+							matchStatus: match.status,
+							parsedName: ca.name,
+							parsedAddress: `${ca.address1}, ${ca.city}, ${ca.state} ${ca.postal_code}`
 						});
 						pdfFile.blocks.push({ block, searchKey: search_key, warningMessage });
 					} else {
 						logger.info('Skipping block (no searchKey or warningMessage)', { 
-							block: block.substring(0, 100),
+							blockIndex: blocks.indexOf(block) + 1,
+							totalBlocks: blocks.length,
+							block: block, // Full block text
+							blockPreview: block.substring(0, 150),
 							matchStatus: match.status,
 							hasRecord: !!match.record,
 							found: found,
-							isNonOrder: isNonOrder
+							isNonOrder: isNonOrder,
+							parsedName: ca.name,
+							parsedAddress: `${ca.address1}, ${ca.city}, ${ca.state} ${ca.postal_code}`
 						});
 					}
 				}
@@ -294,28 +316,66 @@ export async function POST(req: NextRequest) {
 		// If we have exactly one PDF file, return the annotated PDF
 		if (pdfFiles.length === 1 && files.length === 1) {
 			const pdfFile = pdfFiles[0];
+			const blocksWithKeys = pdfFile.blocks.filter(b => b.searchKey || b.warningMessage);
 			logger.info('Annotating PDF', { 
 				fileName: pdfFile.file.name, 
 				blocksCount: pdfFile.blocks.length,
-				blocksWithKeys: pdfFile.blocks.filter(b => b.searchKey || b.warningMessage).length
+				blocksWithKeys: blocksWithKeys.length,
+				blocks: pdfFile.blocks.map(b => ({
+					blockPreview: b.block.substring(0, 100),
+					hasSearchKey: !!b.searchKey,
+					hasWarning: !!b.warningMessage,
+					searchKey: b.searchKey,
+					warningMessage: b.warningMessage?.substring(0, 50)
+				}))
 			});
-			try {
-				const annotatedPdf = await annotatePdfWithSearchKeysImproved(
-					pdfFile.buffer,
-					pdfFile.blocks,
-					pdfFile.text
-				);
-				
-				logger.info('PDF annotation successful', { fileName: pdfFile.file.name });
-				return new NextResponse(annotatedPdf, {
-					headers: {
-						'Content-Type': 'application/pdf',
-						'Content-Disposition': `attachment; filename="${pdfFile.file.name}"`,
-					},
-				});
-			} catch (e: any) {
-				logger.error('PDF annotation failed', { message: e?.message, stack: e?.stack });
-				// Fall back to JSON response if annotation fails
+			
+			if (blocksWithKeys.length === 0) {
+				// Force a minimal annotation so users can verify behavior even when extraction fails
+				logger.warn('No blocks with search keys or warnings; forcing fallback annotation with RESEARCH REQUIRED');
+				const fallbackBlocks = [{ block: 'RESEARCH REQUIRED', warningMessage: 'RESEARCH REQUIRED' as const }];
+				try {
+					const annotatedPdf = await annotatePdfWithSearchKeysImproved(
+						pdfFile.buffer,
+						fallbackBlocks,
+						pdfFile.text
+					);
+					logger.info('PDF annotation (forced fallback) successful', { 
+						fileName: pdfFile.file.name,
+						bufferSize: annotatedPdf.length
+					});
+					return new NextResponse(annotatedPdf, {
+						headers: {
+							'Content-Type': 'application/pdf',
+							'Content-Disposition': `attachment; filename="${pdfFile.file.name}"`,
+						},
+					});
+				} catch (e: any) {
+					logger.error('PDF fallback annotation failed', { message: e?.message, stack: e?.stack });
+					// Fall through to JSON response if fallback also fails
+				}
+			} else {
+				try {
+					const annotatedPdf = await annotatePdfWithSearchKeysImproved(
+						pdfFile.buffer,
+						pdfFile.blocks,
+						pdfFile.text
+					);
+					
+					logger.info('PDF annotation successful', { 
+						fileName: pdfFile.file.name,
+						bufferSize: annotatedPdf.length
+					});
+					return new NextResponse(annotatedPdf, {
+						headers: {
+							'Content-Type': 'application/pdf',
+							'Content-Disposition': `attachment; filename="annotated-${pdfFile.file.name}"`,
+						},
+					});
+				} catch (e: any) {
+					logger.error('PDF annotation failed', { message: e?.message, stack: e?.stack });
+					// Fall back to JSON response if annotation fails
+				}
 			}
 		}
 		
