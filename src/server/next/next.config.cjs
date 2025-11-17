@@ -57,16 +57,19 @@ const nextConfig = {
 			}
 			
 			// Add pdfjs-dist as an external using a function that handles webpack 5 signature
+			// This must match ALL pdfjs-dist imports including .mjs files to prevent bundling
 			const pdfjsExternal = (data, callback) => {
 				// Handle webpack 5 signature: ({ context, request }, callback)
 				if (data && typeof data === 'object' && 'request' in data) {
 					const request = data.request;
 					if (request && typeof request === 'string') {
-						// Match pdfjs-dist and all its submodules/paths
+						// Match pdfjs-dist and all its submodules/paths (including .mjs files)
 						if (request === 'pdfjs-dist' || 
 						    request.startsWith('pdfjs-dist/') ||
 						    request.includes('pdfjs-dist/build/') ||
-						    request.includes('pdfjs-dist/legacy/')) {
+						    request.includes('pdfjs-dist/legacy/') ||
+						    /pdfjs-dist/.test(request)) {
+							// Return as commonjs external - webpack will not bundle it
 							return callback(null, `commonjs ${request}`);
 						}
 					}
@@ -79,7 +82,8 @@ const nextConfig = {
 					if (request === 'pdfjs-dist' || 
 					    request.startsWith('pdfjs-dist/') ||
 					    request.includes('pdfjs-dist/build/') ||
-					    request.includes('pdfjs-dist/legacy/')) {
+					    request.includes('pdfjs-dist/legacy/') ||
+					    /pdfjs-dist/.test(request)) {
 						return callback(null, `commonjs ${request}`);
 					}
 					return callback();
