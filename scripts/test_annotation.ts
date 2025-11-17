@@ -57,7 +57,8 @@ async function testAnnotation() {
 		console.log('Extracting text from PDF...');
 		const tmpPath = path.join(projectRoot, 'data', 'test_temp.pdf');
 		await fs.writeFile(tmpPath, inputBuffer);
-		const extractedText = await extractText(tmpPath);
+		const textExtraction = await extractText(tmpPath);
+		const extractedText = textExtraction.text;
 		await fs.unlink(tmpPath).catch(() => {});
 		
 		console.log(`✓ Extracted ${extractedText.length} characters of text`);
@@ -102,8 +103,8 @@ async function testAnnotation() {
 			try {
 				const canonical = normalizeAddress(block);
 				const match = await reconcileOne(canonical, dao);
-				const name_exact = !!(match.record && isNameExact(canonical.name, match.record.name));
-				const address_exact = !!(match.record && isAddressExact(canonical, match.record));
+				const _nameExact = !!(match.record && isNameExact(canonical.name, match.record.name));
+				const _addressExact = !!(match.record && isAddressExact(canonical, match.record));
 				const found = (match.status === 'EXACT' || match.status === 'CLOSE') && !!match.record;
 				
 				const matchedDepartment = match.record ? (match.record.department || '').toString().trim().toLowerCase() : '';
@@ -116,7 +117,7 @@ async function testAnnotation() {
 					try {
 						const extractedWarning = await extractWarningMessage(match.record);
 						warningMessage = extractedWarning || match.record.warning || 'NON-ORDER: Research Required';
-					} catch (e) {
+					} catch (_warningError) {
 						warningMessage = match.record.warning || 'NON-ORDER: Research Required';
 					}
 				} else if (found && match.record) {
@@ -137,8 +138,9 @@ async function testAnnotation() {
 				} else {
 					console.log(`  Block ${i + 1}: No search key or warning (status: ${match.status})`);
 				}
-			} catch (e: any) {
-				console.error(`  Block ${i + 1}: Error - ${e.message}`);
+			} catch (blockError) {
+				const message = blockError instanceof Error ? blockError.message : String(blockError);
+				console.error(`  Block ${i + 1}: Error - ${message}`);
 			}
 		}
 		
@@ -155,11 +157,7 @@ async function testAnnotation() {
 		
 		// Annotate the PDF
 		console.log('Annotating PDF...');
-		const annotatedPdf = await annotatePdfWithSearchKeysImproved(
-			inputBuffer,
-			blocksWithKeys,
-			extractedText
-		);
+		const annotatedPdf = await annotatePdfWithSearchKeysImproved(inputBuffer, blocksWithKeys, textExtraction);
 		
 		console.log(`✓ PDF annotated successfully (${annotatedPdf.length} bytes)\n`);
 		
@@ -178,9 +176,12 @@ async function testAnnotation() {
 		console.log('✓ Test completed successfully!');
 		console.log(`\nPlease open ${outputPath} to verify annotations match Test_Data.pdf format.`);
 		
-	} catch (error: any) {
-		console.error('\n✗ Test failed:', error);
-		console.error(error.stack);
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		console.error('\n✗ Test failed:', message);
+		if (error instanceof Error && error.stack) {
+			console.error(error.stack);
+		}
 		process.exit(1);
 	}
 }

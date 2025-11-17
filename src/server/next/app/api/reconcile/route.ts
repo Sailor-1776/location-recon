@@ -8,6 +8,7 @@ import { canonicalKey } from '../../../../../types';
 import { getLogger } from '../../../../../utils/logger';
 import { isAddressExact, isNameExact } from '../../../../../match/scorers';
 import { extractText } from '../../../../../ingest/pdfReader';
+import type { PdfTextExtraction } from '../../../../../ingest/pdfReader';
 import { annotatePdfWithSearchKeysImproved } from '../../../../../ingest/pdfAnnotator';
 import { extractWarningMessage } from '../../../../../llm/assistant';
 import fs from 'node:fs/promises';
@@ -109,12 +110,19 @@ export async function POST(req: NextRequest) {
 			}
 		}
 		const files = formData.getAll('files');
-		const pdfFiles: Array<{ file: File; buffer: Buffer; text: string; blocks: Array<{ block: string; searchKey?: string; warningMessage?: string }> }> = [];
+		const pdfFiles: Array<{
+			file: File;
+			buffer: Buffer;
+			text: string;
+			textExtraction: PdfTextExtraction;
+			blocks: Array<{ block: string; searchKey?: string; warningMessage?: string }>;
+		}> = [];
 		
 		for (const f of files) {
 			if (!(f instanceof File)) continue;
 			const buf = Buffer.from(await f.arrayBuffer());
 			let text = '';
+			let textExtraction: PdfTextExtraction | undefined;
 			
 			// Check if it's a PDF file
 			const isPdf = f.name.toLowerCase().endsWith('.pdf') || f.type === 'application/pdf';
@@ -125,12 +133,14 @@ export async function POST(req: NextRequest) {
 					// Write buffer to temp file for pdfReader
 					const tmpPath = path.join(os.tmpdir(), `pdf-${Date.now()}-${Math.random().toString(36).substring(7)}.pdf`);
 					await fs.writeFile(tmpPath, buf);
-					text = await extractText(tmpPath);
+					textExtraction = await extractText(tmpPath);
+					text = textExtraction.text;
 					// Clean up temp file
 					await fs.unlink(tmpPath).catch(() => {});
 				} catch (e: any) {
 					logger.warn('PDF extraction failed', { message: e?.message, file: f.name });
 					text = '';
+					textExtraction = { text };
 				}
 			} else {
 				// For non-PDF files, treat as text
@@ -199,6 +209,7 @@ export async function POST(req: NextRequest) {
 					file: f,
 					buffer: buf,
 					text,
+					textExtraction: textExtraction ?? { text },
 					blocks: [],
 				});
 			}
@@ -346,11 +357,7 @@ export async function POST(req: NextRequest) {
 				logger.warn('No blocks with search keys or warnings; forcing fallback annotation with RESEARCH REQUIRED');
 				const fallbackBlocks = [{ block: 'RESEARCH REQUIRED', warningMessage: 'RESEARCH REQUIRED' as const }];
 				try {
-					const annotatedPdf = await annotatePdfWithSearchKeysImproved(
-						pdfFile.buffer,
-						fallbackBlocks,
-						pdfFile.text
-					);
+					const annotatedPdf = await annotatePdfWithSearchKeysImproved(pdfFile.buffer, fallbackBlocks, pdfFile.textExtraction);
 					logger.info('PDF annotation (forced fallback) successful', { 
 						fileName: pdfFile.file.name,
 						bufferSize: annotatedPdf.length
@@ -367,11 +374,7 @@ export async function POST(req: NextRequest) {
 				}
 			} else {
 				try {
-					const annotatedPdf = await annotatePdfWithSearchKeysImproved(
-						pdfFile.buffer,
-						pdfFile.blocks,
-						pdfFile.text
-					);
+					const annotatedPdf = await annotatePdfWithSearchKeysImproved(pdfFile.buffer, pdfFile.blocks, pdfFile.textExtraction);
 					
 					logger.info('PDF annotation successful', { 
 						fileName: pdfFile.file.name,
@@ -396,11 +399,7 @@ export async function POST(req: NextRequest) {
 		if (pdfFiles.length > 0) {
 			for (const pdfFile of pdfFiles) {
 				try {
-					const annotatedPdf = await annotatePdfWithSearchKeysImproved(
-						pdfFile.buffer,
-						pdfFile.blocks,
-						pdfFile.text
-					);
+					const annotatedPdf = await annotatePdfWithSearchKeysImproved(pdfFile.buffer, pdfFile.blocks, pdfFile.textExtraction);
 					annotatedPdfs[pdfFile.file.name] = annotatedPdf.toString('base64');
 				} catch (e: any) {
 					logger.error('PDF annotation failed', { message: e?.message, file: pdfFile.file.name });

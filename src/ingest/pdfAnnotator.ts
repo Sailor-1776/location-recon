@@ -1,5 +1,6 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { getLogger } from '../utils/logger';
+import type { PdfTextExtraction } from './pdfReader';
 
 const logger = getLogger();
 
@@ -9,7 +10,16 @@ type AnnotatableBlock = {
 	warningMessage?: string;
 };
 
-type PageLines = string[][];
+type PageLine = {
+	text: string;
+	normalized: string;
+	lineIndex: number;
+	x?: number;
+	maxX?: number;
+	y?: number;
+};
+
+type PageLines = PageLine[][];
 
 type BlockPlacement = {
 	pageIndex: number;
@@ -60,39 +70,78 @@ function similarity(a: string, b: string): number {
 	return overlap / new Set([...tokensA, ...tokensB]).size;
 }
 
-function splitTextByPages(text: string | undefined, pageCount: number): PageLines {
-	if (!text?.trim() || pageCount <= 0) {
-		return Array.from({ length: Math.max(pageCount, 1) }, () => []);
+function buildPageLines(textSource: PdfTextExtraction | string | undefined, pageCount: number): PageLines {
+	const safePageCount = Math.max(pageCount, 1);
+
+	const positionalPages = typeof textSource === 'object' && textSource !== null && 'text' in textSource ? textSource.pages : undefined;
+	if (positionalPages?.length) {
+		const result: PageLines = [];
+		for (let pageIndex = 0; pageIndex < safePageCount; pageIndex++) {
+			const page = positionalPages[pageIndex];
+			if (!page) {
+				result.push([]);
+				continue;
+			}
+			result.push(
+				page.lines.map(line => ({
+					text: line.text,
+					normalized: normalize(line.text),
+					lineIndex: line.lineIndex,
+					x: Number.isFinite(line.x) ? line.x : undefined,
+					maxX: Number.isFinite(line.maxX) ? line.maxX : undefined,
+					y: Number.isFinite(line.y) ? line.y : undefined,
+				}))
+			);
+		}
+		return result;
+	}
+
+	const text = typeof textSource === 'string' ? textSource : textSource?.text;
+	if (!text?.length) {
+		return Array.from({ length: safePageCount }, () => []);
 	}
 
 	const normalized = text.replace(/\r\n/g, '\n');
-	let segments = normalized.split(/\f+/).filter(segment => segment.trim().length > 0);
+	const segments = normalized.split(/\f+/);
 
-	if (segments.length === pageCount) {
-		return segments.map(segment =>
-			segment
-				.split('\n')
-				.map(line => line.trim())
-				.filter(line => line.length > 0)
-		);
+	const mapSegmentToLines = (segment: string): PageLine[] =>
+		segment.split('\n').map((line, idx) => {
+			const trimmed = line.trim();
+			return {
+				text: trimmed,
+				normalized: trimmed ? normalize(trimmed) : '',
+				lineIndex: idx,
+			};
+		});
+
+	if (segments.length === safePageCount) {
+		return segments.map(mapSegmentToLines);
 	}
 
-	const lines = normalized
-		.split('\n')
-		.map(line => line.trim())
-		.filter(line => line.length > 0);
-
-	const perPage = Math.max(1, Math.ceil(lines.length / Math.max(pageCount, 1)));
+	const lines = normalized.split('\n');
+	const perPage = Math.max(1, Math.ceil(lines.length / safePageCount));
 	const result: PageLines = [];
-	for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+	for (let pageIndex = 0; pageIndex < safePageCount; pageIndex++) {
 		const start = pageIndex * perPage;
 		const end = start + perPage;
-		result.push(lines.slice(start, end));
+		result.push(
+			lines.slice(start, end).map((line, idx) => {
+				const trimmed = line.trim();
+				return {
+					text: trimmed,
+					normalized: trimmed ? normalize(trimmed) : '',
+					lineIndex: idx,
+				};
+			})
+		);
 	}
 	return result;
 }
 
-function findAnchor(block: string, pageLines: PageLines): { pageIndex: number; lineIndex: number; score: number } | null {
+function findAnchor(
+	block: string,
+	pageLines: PageLines
+): { pageIndex: number; lineIndex: number; score: number; line: PageLine } | null {
 	const blockLines = block
 		.split(/\r?\n/)
 		.map(line => line.trim())
@@ -109,10 +158,11 @@ function findAnchor(block: string, pageLines: PageLines): { pageIndex: number; l
 		const lines = pageLines[pageIndex];
 		for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
 			const line = lines[lineIndex]!;
+			if (!line.text) continue;
 			for (const candidate of candidates) {
-				const score = similarity(candidate, line);
+				const score = similarity(candidate, line.text);
 				if (score > (best?.score ?? 0)) {
-					best = { pageIndex, lineIndex, score };
+					best = { pageIndex, lineIndex, score, line };
 				}
 			}
 		}
@@ -167,6 +217,15 @@ function buildResearchPlacements(pageCount: number, pages: ReturnType<PDFDocumen
 	return placements;
 }
 
+function clampHorizontalTarget(value: number, pageWidth: number): number {
+	const minX = 40;
+	const maxX = Math.max(minX, pageWidth - 40);
+	if (!Number.isFinite(value)) {
+		return maxX;
+	}
+	return Math.max(minX, Math.min(value, maxX));
+}
+
 function preparePlacements(
 	blocks: AnnotatableBlock[],
 	pages: ReturnType<PDFDocument['getPages']>,
@@ -191,10 +250,16 @@ function preparePlacements(
 		const page = pages[safePageIndex];
 		const { width, height } = page.getSize();
 
-		const estimatedLine = anchor?.lineIndex ?? (index % (pageLines[safePageIndex]?.length || DEFAULT_LINES_PER_PAGE));
-		const suggestedY = height - TOP_MARGIN - estimatedLine * LINE_HEIGHT;
+		const pageLineEntries = pageLines[safePageIndex] ?? [];
+		const fallbackLineIndex = pageLineEntries.length > 0 ? index % pageLineEntries.length : index % DEFAULT_LINES_PER_PAGE;
+		const estimatedLine = anchor?.line?.lineIndex ?? anchor?.lineIndex ?? fallbackLineIndex;
+		const anchorY = anchor?.line?.y;
+		const suggestedY = typeof anchorY === 'number' ? anchorY : height - TOP_MARGIN - estimatedLine * LINE_HEIGHT;
 		const y = reserveY(safePageIndex, suggestedY, pageCursors, height);
-		const x = Math.max(width * 0.65, width - 180);
+		const defaultX = Math.max(width * 0.65, width - 180);
+		const anchorMaxX = anchor?.line?.maxX;
+		const desiredX = anchorMaxX !== undefined ? Math.max(defaultX, anchorMaxX + 12) : defaultX;
+		const x = clampHorizontalTarget(desiredX, width);
 
 		placements.push({
 			pageIndex: safePageIndex,
@@ -208,6 +273,13 @@ function preparePlacements(
 	return placements;
 }
 
+function resolveTextX(desiredX: number, pageWidth: number, textWidth: number, padding: number): number {
+	const minX = 40;
+	const maxX = Math.max(minX, pageWidth - (textWidth + padding * 2) - 4);
+	if (maxX <= minX) return minX;
+	return Math.max(minX, Math.min(desiredX, maxX));
+}
+
 function drawPlacements(
 	pdfDoc: PDFDocument,
 	placements: BlockPlacement[],
@@ -218,12 +290,14 @@ function drawPlacements(
 
 	for (const placement of placements) {
 		const page = pages[placement.pageIndex];
+		const { width: pageWidth } = page.getSize();
 		const textWidth = font.widthOfTextAtSize(placement.text, fontSize);
 		const textHeight = fontSize;
 		const padding = 3;
+		const actualX = resolveTextX(placement.x, pageWidth, textWidth, padding);
 
 		page.drawRectangle({
-			x: placement.x - padding,
+			x: actualX - padding,
 			y: placement.y - textHeight - padding,
 			width: textWidth + padding * 2,
 			height: textHeight + padding * 2,
@@ -231,32 +305,32 @@ function drawPlacements(
 		});
 
 		page.drawLine({
-			start: { x: placement.x - padding, y: placement.y - textHeight - padding },
-			end: { x: placement.x + textWidth + padding, y: placement.y - textHeight - padding },
+			start: { x: actualX - padding, y: placement.y - textHeight - padding },
+			end: { x: actualX + textWidth + padding, y: placement.y - textHeight - padding },
 			thickness: 1,
 			color: rgb(1, 0, 0),
 		});
 		page.drawLine({
-			start: { x: placement.x + textWidth + padding, y: placement.y - textHeight - padding },
-			end: { x: placement.x + textWidth + padding, y: placement.y + padding },
+			start: { x: actualX + textWidth + padding, y: placement.y - textHeight - padding },
+			end: { x: actualX + textWidth + padding, y: placement.y + padding },
 			thickness: 1,
 			color: rgb(1, 0, 0),
 		});
 		page.drawLine({
-			start: { x: placement.x + textWidth + padding, y: placement.y + padding },
-			end: { x: placement.x - padding, y: placement.y + padding },
+			start: { x: actualX + textWidth + padding, y: placement.y + padding },
+			end: { x: actualX - padding, y: placement.y + padding },
 			thickness: 1,
 			color: rgb(1, 0, 0),
 		});
 		page.drawLine({
-			start: { x: placement.x - padding, y: placement.y + padding },
-			end: { x: placement.x - padding, y: placement.y - textHeight - padding },
+			start: { x: actualX - padding, y: placement.y + padding },
+			end: { x: actualX - padding, y: placement.y - textHeight - padding },
 			thickness: 1,
 			color: rgb(1, 0, 0),
 		});
 
 		page.drawText(placement.text, {
-			x: placement.x,
+			x: actualX,
 			y: placement.y,
 			size: fontSize,
 			font,
@@ -268,12 +342,12 @@ function drawPlacements(
 async function annotatePdfOneShot(
 	pdfBuffer: Buffer,
 	locationBlocks: AnnotatableBlock[],
-	extractedText?: string
+	extractedText?: PdfTextExtraction | string
 ): Promise<Buffer> {
 	const pdfDoc = await PDFDocument.load(pdfBuffer);
 	const pages = pdfDoc.getPages();
 	const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-	const pageLines = splitTextByPages(extractedText, pages.length);
+	const pageLines = buildPageLines(extractedText, pages.length);
 
 	const placements = preparePlacements(locationBlocks, pages, pageLines);
 
@@ -298,7 +372,7 @@ async function annotatePdfOneShot(
 export async function annotatePdfWithSearchKeys(
 	pdfBuffer: Buffer,
 	locationBlocks: AnnotatableBlock[],
-	extractedText?: string
+	extractedText?: PdfTextExtraction | string
 ): Promise<Buffer> {
 	return annotatePdfOneShot(pdfBuffer, locationBlocks, extractedText);
 }
@@ -306,7 +380,7 @@ export async function annotatePdfWithSearchKeys(
 export async function annotatePdfWithSearchKeysImproved(
 	pdfBuffer: Buffer,
 	locationBlocks: AnnotatableBlock[],
-	extractedText: string
+	extractedText?: PdfTextExtraction | string
 ): Promise<Buffer> {
 	return annotatePdfOneShot(pdfBuffer, locationBlocks, extractedText);
 }

@@ -24,7 +24,10 @@ export interface CLIOptions {
 
 async function readTextForFile(filePath: string): Promise<string> {
 	const ext = path.extname(filePath).toLowerCase();
-	if (ext === '.pdf') return pdfReader.extractText(filePath);
+	if (ext === '.pdf') {
+		const extraction = await pdfReader.extractText(filePath);
+		return extraction.text;
+	}
 	if (ext === '.eml' || ext === '.msg') return emailReader.extractText(filePath);
 	// default: text
 	return fsp.readFile(filePath, 'utf8');
@@ -68,7 +71,7 @@ export async function runCli(argv: string[]): Promise<number> {
 	const outFmt = (opts.format as Format) || 'jsonl';
 	const writer = process.stdout;
 
-	let fileTexts: Array<{ file: string; text: string }> = [];
+	const fileTexts: Array<{ file: string; text: string }> = [];
 	if (opts.input === '-') {
 		const buf = await fsp.readFile(0, 'utf8');
 		fileTexts.push({ file: '<stdin>', text: buf });

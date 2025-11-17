@@ -1,6 +1,27 @@
 import fs from 'node:fs/promises';
 import { getLogger } from '../utils/logger';
 import { createRequire } from 'module';
+import type * as PdfJsModule from 'pdfjs-dist/legacy/build/pdf';
+
+export type PdfTextLine = {
+	text: string;
+	x: number;
+	maxX: number;
+	y: number;
+	width: number;
+	lineIndex: number;
+};
+
+export type PdfTextPage = {
+	width: number;
+	height: number;
+	lines: PdfTextLine[];
+};
+
+export type PdfTextExtraction = {
+	text: string;
+	pages?: PdfTextPage[];
+};
 
 type PDFParseResult = {
 	text: string;
@@ -10,13 +31,129 @@ type PDFParseResult = {
 	version?: string;
 };
 
-async function getPdfjsLib(): Promise<any | null> {
+type PdfJsLib = typeof PdfJsModule;
+type CanvasFactory = (width: number, height: number) => {
+	getContext: (contextId: string) => unknown;
+	toBuffer: (format: string) => Buffer;
+};
+
+const LINE_JOIN_THRESHOLD = 2; // points
+const WORD_GAP_THRESHOLD = 2; // points
+
+function isFiniteNumber(value: unknown): value is number {
+	return typeof value === 'number' && Number.isFinite(value);
+}
+
+function fallbackWidthForText(text: string): number {
+	return Math.max(text.length, 1) * 4;
+}
+
+type RawTextItem = {
+	str?: string;
+	transform?: number[];
+	width?: number;
+	textMatrix?: number[];
+};
+
+function groupItemsIntoLines(items: RawTextItem[]): PdfTextLine[] {
+	const processed = items
+		.filter((item) => typeof item?.str === 'string' && item.str.trim().length > 0)
+		.map((item) => {
+			const transform = Array.isArray(item.transform)
+				? item.transform
+				: Array.isArray(item.textMatrix)
+					? item.textMatrix
+					: undefined;
+			const x = isFiniteNumber(transform?.[4]) ? transform![4] : 0;
+			const y = isFiniteNumber(transform?.[5]) ? transform![5] : 0;
+			const width = isFiniteNumber(item.width) && item.width > 0 ? item.width : fallbackWidthForText(item.str!.trim());
+			return {
+				text: item.str!.replace(/\s+/g, ' '),
+				x,
+				y,
+				width,
+			};
+		})
+		.sort((a, b) => {
+			const deltaY = b.y - a.y;
+			if (Math.abs(deltaY) > LINE_JOIN_THRESHOLD) {
+				return deltaY;
+			}
+			return a.x - b.x;
+		});
+
+	const grouped: Array<{ textParts: string[]; xMin: number; xMax: number; y: number; lastX: number }> = [];
+	for (const item of processed) {
+		const last = grouped[grouped.length - 1];
+		const endX = item.x + item.width;
+		if (!last || Math.abs(item.y - last.y) > LINE_JOIN_THRESHOLD) {
+			grouped.push({
+				textParts: [item.text],
+				xMin: item.x,
+				xMax: endX,
+				y: item.y,
+				lastX: endX,
+			});
+			continue;
+		}
+
+		const gap = item.x - last.lastX;
+		if (gap > WORD_GAP_THRESHOLD) {
+			last.textParts.push(' ');
+		}
+		last.textParts.push(item.text);
+		last.xMin = Math.min(last.xMin, item.x);
+		last.xMax = Math.max(last.xMax, endX);
+		last.lastX = Math.max(last.lastX, endX);
+	}
+
+	return grouped
+		.map((line, idx) => ({
+			text: line.textParts.join('').trim(),
+			x: line.xMin,
+			maxX: line.xMax,
+			y: line.y,
+			width: Math.max(line.xMax - line.xMin, 0),
+			lineIndex: idx,
+		}))
+		.filter((line) => line.text.length > 0);
+}
+
+async function extractLayoutWithPdfjs(path: string, logger: ReturnType<typeof getLogger>): Promise<PdfTextPage[] | null> {
+	try {
+		const pdfjsLib = await getPdfjsLib();
+		if (!pdfjsLib) return null;
+		const buf = await fs.readFile(path);
+		const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buf), useSystemFonts: true, disableWorker: true });
+		const pdf = await loadingTask.promise;
+		const pages: PdfTextPage[] = [];
+		for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const page = await pdf.getPage(pageNum);
+			const viewport = page.getViewport({ scale: 1.0 });
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			const content = await page.getTextContent();
+			const lines = groupItemsIntoLines((content.items ?? []) as RawTextItem[]);
+			pages.push({
+				width: viewport.width,
+				height: viewport.height,
+				lines,
+			});
+		}
+		return pages;
+	} catch (err: unknown) {
+		const message = err instanceof Error ? err.message : String(err);
+		logger.warn?.('Failed to extract PDF layout metadata', { message });
+		return null;
+	}
+}
+
+async function getPdfjsLib(): Promise<PdfJsLib | null> {
 	try {
 		// Use legacy build for Node.js compatibility (avoids DOMMatrix errors)
 		// eslint-disable-next-line @typescript-eslint/no-implied-eval
 		const dynamicImport = new Function('m', 'return import(m)');
-		// @ts-expect-error any
-		const pdfjsLib = await dynamicImport('pdfjs-dist/legacy/build/pdf');
+		const pdfjsLib = (await dynamicImport('pdfjs-dist/legacy/build/pdf')) as PdfJsLib;
 		// @ts-expect-error any
 		if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
 			// @ts-expect-error any
@@ -27,7 +164,7 @@ async function getPdfjsLib(): Promise<any | null> {
 		try {
 			const require = createRequire(import.meta.url);
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const fallback = require('pdfjs-dist/legacy/build/pdf');
+			const fallback = require('pdfjs-dist/legacy/build/pdf') as PdfJsLib;
 			if (fallback && fallback.GlobalWorkerOptions) {
 				fallback.GlobalWorkerOptions.workerSrc = undefined as unknown as string;
 			}
@@ -84,14 +221,14 @@ async function tryOcrFallback(path: string): Promise<string | null> {
 		const pdfjsLib = await getPdfjsLib();
 		if (!pdfjsLib) return null;
 		// Optional dependency: canvas. Use obfuscated dynamic import to avoid bundler hard failure.
-		let createCanvas: ((w: number, h: number) => any) | null = null;
+		let createCanvas: CanvasFactory | null = null;
 		try {
 			// eslint-disable-next-line @typescript-eslint/no-implied-eval
 			const dynamicImport = new Function('m', 'return import(m)');
-			// @ts-expect-error any
 			const canvasMod = await dynamicImport('canvas');
-			// @ts-expect-error canvas types
-			createCanvas = (canvasMod as any).createCanvas;
+			if (canvasMod && typeof canvasMod.createCanvas === 'function') {
+				createCanvas = canvasMod.createCanvas as CanvasFactory;
+			}
 		} catch {
 			createCanvas = null;
 		}
@@ -135,8 +272,9 @@ async function tryOcrFallback(path: string): Promise<string | null> {
 	}
 }
 
-export async function extractText(path: string): Promise<string> {
+export async function extractText(path: string): Promise<PdfTextExtraction> {
 	const logger = getLogger();
+	let text = '';
 	const parsed = await tryPdfParse(path);
 	if (parsed && parsed.text?.trim()) {
 		const pages = parsed.numpages ?? 1;
@@ -146,29 +284,43 @@ export async function extractText(path: string): Promise<string> {
 			const pdfjsRes = await tryPdfjsExtract(path);
 			if (pdfjsRes?.text?.trim()) {
 				logger.warn('PDF low text density; used pdfjs text extraction fallback');
-				return pdfjsRes.text;
+				text = pdfjsRes.text;
+			} else {
+				const ocrText = await tryOcrFallback(path);
+				if (ocrText && ocrText.trim().length > parsed.text.trim().length) {
+					logger.warn('PDF low text density; used OCR fallback');
+					text = ocrText;
+				} else {
+					text = parsed.text;
+				}
 			}
+		} else {
+			text = parsed.text;
+		}
+	} else {
+		// Try pdfjs text extraction if pdf-parse failed
+		const pdfjsRes = await tryPdfjsExtract(path);
+		if (pdfjsRes?.text?.trim()) {
+			logger.warn('PDF parse failed; used pdfjs text extraction fallback');
+			text = pdfjsRes.text;
+		} else {
 			const ocrText = await tryOcrFallback(path);
-			if (ocrText && ocrText.trim().length > parsed.text.trim().length) {
-				logger.warn('PDF low text density; used OCR fallback');
-				return ocrText;
+			if (ocrText) {
+				logger.warn('PDF parse failed; used OCR fallback');
+				text = ocrText;
+			} else {
+				logger.warn('PDF parse failed; returning empty string');
+				text = '';
 			}
 		}
-		return parsed.text;
 	}
-	// Try pdfjs text extraction if pdf-parse failed
-	const pdfjsRes = await tryPdfjsExtract(path);
-	if (pdfjsRes?.text?.trim()) {
-		logger.warn('PDF parse failed; used pdfjs text extraction fallback');
-		return pdfjsRes.text;
-	}
-	const ocrText = await tryOcrFallback(path);
-	if (ocrText) {
-		logger.warn('PDF parse failed; used OCR fallback');
-		return ocrText;
-	}
-	logger.warn('PDF parse failed; returning empty string');
-	return '';
+
+	const layoutPages = await extractLayoutWithPdfjs(path, logger);
+
+	return {
+		text,
+		pages: layoutPages ?? undefined,
+	};
 }
 
 

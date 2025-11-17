@@ -71,7 +71,8 @@ async function testAnnotation() {
 		console.log('Extracting text from PDF...');
 		const tmpPath = path.join(projectRoot, 'data', 'test_temp.pdf');
 		await fs.writeFile(tmpPath, inputBuffer);
-		const extractedText = await extractText(tmpPath);
+		const textExtraction = await extractText(tmpPath);
+		const extractedText = textExtraction.text;
 		await fs.unlink(tmpPath).catch(() => {});
 		
 		console.log(`✓ Extracted ${extractedText.length} characters of text`);
@@ -116,8 +117,8 @@ async function testAnnotation() {
 			try {
 				const canonical = normalizeAddress(block);
 				const match = await reconcileOne(canonical, dao);
-				const name_exact = !!(match.record && isNameExact(canonical.name, match.record.name));
-				const address_exact = !!(match.record && isAddressExact(canonical, match.record));
+				const _nameExact = !!(match.record && isNameExact(canonical.name, match.record.name));
+				const _addressExact = !!(match.record && isAddressExact(canonical, match.record));
 				const found = (match.status === 'EXACT' || match.status === 'CLOSE') && !!match.record;
 				
 				const matchedDepartment = match.record ? (match.record.department || '').toString().trim().toLowerCase() : '';
@@ -169,11 +170,7 @@ async function testAnnotation() {
 		
 		// Annotate the PDF
 		console.log('Annotating PDF...');
-		const annotatedPdf = await annotatePdfWithSearchKeysImproved(
-			inputBuffer,
-			blocksWithKeys,
-			extractedText
-		);
+		const annotatedPdf = await annotatePdfWithSearchKeysImproved(inputBuffer, blocksWithKeys, textExtraction);
 		
 		console.log(`✓ PDF annotated successfully (${annotatedPdf.length} bytes)\n`);
 		
