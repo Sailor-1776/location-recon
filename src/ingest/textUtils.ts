@@ -60,6 +60,84 @@ function looksLikeDepartment(line: string): boolean {
 	return hasKeyword && !looksLikeAddress;
 }
 
+/**
+ * Extracts structured facility information from text following the pattern:
+ * Facility name
+ * Facility Address
+ * Facility city, state, zip code
+ * Facility Phone Number (optional)
+ * Department (optional)
+ * 
+ * Example:
+ * Rio Grande Regional Hospital
+ * 101 E. Ridge Road
+ * McAllen, Texas 78503
+ * P: (956) 632-6000
+ * 07/13/23 to Present – Radiology Records
+ */
+export function extractStructuredFacilities(text: string): string[] {
+	const lines = text
+		.split(/\r?\n/)
+		.map((l) => l.trim())
+		.filter((l) => l.length > 0);
+
+	const blocks: string[] = [];
+	
+	// Look for patterns where we have:
+	// 1. A facility name (line without numbers, or with minimal numbers)
+	// 2. An address line (contains street number and street name)
+	// 3. City, state, zip line
+	// 4. Optional phone number
+	// 5. Optional department
+	
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		
+		// If we find a city/state/zip line, look backwards for facility info
+		if (looksLikeCityStateZip(line)) {
+			const cityStateZipLine = line;
+			const addressLine = lines[i - 1] || '';
+			const nameLine = lines[i - 2] || '';
+			const phoneLine = lines[i + 1] || '';
+			const departmentLine = lines[i + 2] || '';
+			
+			// Validate we have at least name and address
+			// Name should not look like an address (no street numbers)
+			const hasValidName = nameLine && !/^\d+\s/.test(nameLine) && nameLine.length > 3;
+			// Address should have a street number
+			const hasValidAddress = addressLine && /^\d+/.test(addressLine);
+			
+			if (hasValidName && hasValidAddress) {
+				const blockParts: string[] = [nameLine, addressLine, cityStateZipLine];
+				
+				// Add phone if present (starts with P:, Phone:, Tel:, etc. or matches phone pattern)
+				if (phoneLine && /^P:?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/i.test(phoneLine)) {
+					blockParts.push(phoneLine);
+				}
+				
+				// Add department if present
+				if (looksLikeDepartment(departmentLine)) {
+					blockParts.push(departmentLine);
+				} else if (looksLikeDepartment(phoneLine) && !/^P:?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/i.test(phoneLine)) {
+					// Sometimes department is on the phone line if phone wasn't there
+					blockParts.push(phoneLine);
+				}
+				
+				blocks.push(blockParts.join('\n'));
+			}
+		}
+	}
+	
+	// Deduplicate while preserving order
+	const seen = new Set<string>();
+	return blocks.filter((b) => {
+		const key = b.toLowerCase().replace(/\s+/g, ' ');
+		if (seen.has(key)) return false;
+		seen.add(key);
+		return true;
+	});
+}
+
 export function extractCandidateBlocks(text: string): string[] {
 	const lines = text
 		.split(/\r?\n/)

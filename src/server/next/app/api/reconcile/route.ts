@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { extractCandidateBlocks } from '../../../../../ingest/textUtils';
+import { extractCandidateBlocks, extractStructuredFacilities } from '../../../../../ingest/textUtils';
 import { normalizeAddress } from '../../../../../normalize/address';
 import { getDAO } from '../../../../../match/locationsDAO';
 import { loadConfig } from '../../../../../config';
@@ -7,6 +7,10 @@ import { reconcileOne } from '../../../../../match/matcher';
 import { canonicalKey } from '../../../../../types';
 import { getLogger } from '../../../../../utils/logger';
 import { isAddressExact, isNameExact } from '../../../../../match/scorers';
+import { extractText } from '../../../../../ingest/pdfReader';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
 
 export const runtime = 'nodejs';
 
@@ -54,13 +58,37 @@ export async function POST(req: NextRequest) {
 			if (!(f instanceof File)) continue;
 			const buf = Buffer.from(await f.arrayBuffer());
 			let text = '';
-			// Minimal: treat as text for now (UI demo). CLI handles PDFs/emails fully.
-			try {
-				text = buf.toString('utf8');
-			} catch {
-				text = '';
+			
+			// Check if it's a PDF file
+			const isPdf = f.name.toLowerCase().endsWith('.pdf') || f.type === 'application/pdf';
+			
+			if (isPdf) {
+				// Extract text from PDF using pdfReader
+				try {
+					// Write buffer to temp file for pdfReader
+					const tmpPath = path.join(os.tmpdir(), `pdf-${Date.now()}-${Math.random().toString(36).substring(7)}.pdf`);
+					await fs.writeFile(tmpPath, buf);
+					text = await extractText(tmpPath);
+					// Clean up temp file
+					await fs.unlink(tmpPath).catch(() => {});
+				} catch (e: any) {
+					logger.warn('PDF extraction failed', { message: e?.message, file: f.name });
+					text = '';
+				}
+			} else {
+				// For non-PDF files, treat as text
+				try {
+					text = buf.toString('utf8');
+				} catch {
+					text = '';
+				}
 			}
-			const blocks = extractCandidateBlocks(text);
+			
+			// Use structured facility extraction for PDFs, fallback to candidate blocks for other formats
+			const blocks = isPdf && text.trim() 
+				? extractStructuredFacilities(text) 
+				: extractCandidateBlocks(text);
+			
 			for (const block of blocks) {
 				const ca = normalizeAddress(block);
 				const match = await reconcileOne(ca, dao);
