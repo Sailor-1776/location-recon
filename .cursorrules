@@ -1,0 +1,25 @@
+Determinism and privacy rules:
+- Deterministic rules first. LLM is optional only for explanations/repairs in gray zones; never changes final thresholds.
+- Read-only access to MR8; never write. Export new locations via CSV.
+- No external logging of raw PII. Use src/utils/redact.ts. Mask ZIP to 5 digits and hash street lines in logs.
+- Gracefully degrade when optional deps (libpostal, Tesseract, DB drivers) are unavailable. Tests must still pass.
+
+Development rules:
+- Core logic lives in src/. Both CLI and Next.js UI reuse the same modules.
+- Keep TypeScript strict. Use Zod for runtime validation on external inputs.
+- Keep thresholds and scoring in src/match/scorers.ts as exported constants.
+
+Deterministic-first policy
+- Prefer deterministic rules (phonetic/fuzzy/geo) before LLM.
+- LLM is used only to repair/explain ambiguous cases; never to change match decisions.
+
+Data handling
+- Read-only access to MR8. No writes.
+- Export NEW records to CSV only.
+- Never log full PII; use `src/utils/redact.ts` helpers for masking/hashing.
+
+Testing/CI
+- No hard dependency on libpostal or tesseract in tests; degrade gracefully.
+
+
+

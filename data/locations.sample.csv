@@ -1,0 +1,16 @@
+id,name,address1,address2,city,state,postal_code,country,latitude,longitude,search_key
+1,General Hospital,123 Main Street,,Springfield,IL,62701,US,39.8017,-89.6436,general hospital|123 main street|springfield|il|62701
+2,Springfield Clinic,200 Oak Avenue,Suite 300,Springfield,IL,62704,US,39.7817,-89.6501,springfield clinic|200 oak avenue|springfield|il|62704
+3,River Valley Health,450 River Rd,,Davenport,IA,52801,US,41.5236,-90.5776,river valley health|450 river rd|davenport|ia|52801
+4,Mountain View Medical,75 Skyline Blvd,Ste 12,Boulder,CO,80302,US,40.01499,-105.2705,mountain view medical|75 skyline blvd|boulder|co|80302
+5,Lakeside Care Center,890 Lake Shore Dr,,Chicago,IL,60611,US,41.9032,-87.6167,lakeside care center|890 lake shore dr|chicago|il|60611
+6,Highway Health,1010 Highway 6,,Sugar Land,TX,77478,US,29.6197,-95.6349,highway health|1010 highway 6|sugar land|tx|77478
+7,Capitol Health Partners,1600 Pennsylvania Avenue NW,,Washington,DC,20500,US,38.8977,-77.0365,capitol health partners|1600 pennsylvania avenue nw|washington|dc|20500
+8,Bay Area Clinic,300 Market St,#500,San Francisco,CA,94105,US,37.7890,-122.3969,bay area clinic|300 market st|san francisco|ca|94105
+9,Seaside Hospital,42 Ocean Blvd,Unit 2,Miami,FL,33132,US,25.7781,-80.1936,seaside hospital|42 ocean blvd|miami|fl|33132
+10,St. Mary's Medical Center,800 Elm St,,Nashua,NH,03060,US,42.7654,-71.4676,st mary s medical center|800 elm st|nashua|nh|03060
+11,Northside Hospital,5555 Peachtree Pkwy,,Atlanta,GA,30342,US,33.8840,-84.3390,northside hospital|5555 peachtree pkwy|atlanta|ga|30342
+12,Prairie Health,9100 W Hwy 50,,O'Fallon,IL,62269,US,38.5923,-89.9112,prairie health|9100 w hwy 50|o fallon|il|62269
+
+
+
