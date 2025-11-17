@@ -97,34 +97,50 @@ export function extractStructuredFacilities(text: string): string[] {
 		if (looksLikeCityStateZip(line)) {
 			const cityStateZipLine = line;
 			const addressLine = lines[i - 1] || '';
-			const nameLine = lines[i - 2] || '';
+			const potentialNameLine = lines[i - 2] || '';
+			const potentialFacilityNameLine = lines[i - 3] || '';
 			const phoneLine = lines[i + 1] || '';
 			const departmentLine = lines[i + 2] || '';
 			
-			// Validate we have at least name and address
-			// Name should not look like an address (no street numbers)
-			const hasValidName = nameLine && !/^\d+\s/.test(nameLine) && nameLine.length > 3;
 			// Address should have a street number
 			const hasValidAddress = addressLine && /^\d+/.test(addressLine);
 			
-			if (hasValidName && hasValidAddress) {
-				const blockParts: string[] = [nameLine, addressLine, cityStateZipLine];
-				
-				// Add phone if present (starts with P:, Phone:, Tel:, etc. or matches phone pattern)
-				if (phoneLine && /^P:?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/i.test(phoneLine)) {
-					blockParts.push(phoneLine);
-				}
-				
-				// Add department if present
-				if (looksLikeDepartment(departmentLine)) {
-					blockParts.push(departmentLine);
-				} else if (looksLikeDepartment(phoneLine) && !/^P:?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/i.test(phoneLine)) {
-					// Sometimes department is on the phone line if phone wasn't there
-					blockParts.push(phoneLine);
-				}
-				
-				blocks.push(blockParts.join('\n'));
+			if (!hasValidAddress) continue;
+			
+			// Determine the facility name line
+			// Check if potentialNameLine looks like a doctor name (contains M.D., MD, D.O., DO, etc.)
+			const looksLikeDoctorName = /,\s*(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?)/i.test(potentialNameLine);
+			
+			let nameLine: string;
+			let blockParts: string[];
+			
+			if (looksLikeDoctorName && potentialFacilityNameLine) {
+				// We have: facility name, doctor name, address, city/state/zip
+				nameLine = potentialFacilityNameLine;
+				blockParts = [nameLine, potentialNameLine, addressLine, cityStateZipLine];
+			} else {
+				// Standard case: facility name, address, city/state/zip
+				nameLine = potentialNameLine;
+				// Name should not look like an address (no street numbers)
+				const hasValidName = nameLine && !/^\d+\s/.test(nameLine) && nameLine.length > 3;
+				if (!hasValidName) continue;
+				blockParts = [nameLine, addressLine, cityStateZipLine];
 			}
+			
+			// Add phone if present (starts with P:, Phone:, Tel:, etc. or matches phone pattern)
+			if (phoneLine && /^P:?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/i.test(phoneLine)) {
+				blockParts.push(phoneLine);
+			}
+			
+			// Add department if present
+			if (looksLikeDepartment(departmentLine)) {
+				blockParts.push(departmentLine);
+			} else if (looksLikeDepartment(phoneLine) && !/^P:?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/i.test(phoneLine)) {
+				// Sometimes department is on the phone line if phone wasn't there
+				blockParts.push(phoneLine);
+			}
+			
+			blocks.push(blockParts.join('\n'));
 		}
 	}
 	

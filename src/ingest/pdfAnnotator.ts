@@ -1,33 +1,39 @@
 import { PDFDocument, PDFPage, rgb, StandardFonts } from 'pdf-lib';
 import { extractStructuredFacilities } from './textUtils';
 import { getLogger } from '../utils/logger';
+import { createRequire } from 'module';
 
 const logger = getLogger();
 
 // Dynamically import pdfjs-dist to avoid webpack bundling issues in Next.js
-// In Node.js/server environment, use require() for better externalization support
+// Use createRequire for Node.js/server environment to handle CommonJS modules in ES module context
 async function getPdfjsLib() {
-	if (typeof window === 'undefined') {
-		// Node.js/server environment - use require() to avoid webpack bundling
-		// Use a variable to make the require truly dynamic so webpack doesn't analyze it
-		const moduleName = 'pdfjs-dist';
-		// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-		const pdfjsLib = require(moduleName);
-		// Set up pdfjs-dist worker for Node.js
-		if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
-			pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+	try {
+		if (typeof window === 'undefined') {
+			// Node.js/server environment - use createRequire for ES module compatibility
+			// createRequire needs a file URL in ES modules
+			const require = createRequire(import.meta.url);
+			const pdfjsLib = require('pdfjs-dist');
+			// Set up pdfjs-dist worker for Node.js
+			if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
+				pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+			}
+			return pdfjsLib;
+		} else {
+			// Browser environment - use dynamic import
+			const pdfjsLib = await import('pdfjs-dist');
+			return pdfjsLib;
 		}
-		return pdfjsLib;
-	} else {
-		// Browser environment - use dynamic import
-		const pdfjsLib = await import('pdfjs-dist');
-		return pdfjsLib;
+	} catch (error: any) {
+		logger.error('Failed to import pdfjs-dist', { message: error?.message });
+		throw error;
 	}
 }
 
 interface LocationAnnotation {
 	block: string;
-	searchKey: string;
+	searchKey?: string;
+	warningMessage?: string;
 	pageIndex: number;
 	xPosition: number;
 	yPosition: number;
@@ -102,7 +108,7 @@ function groupTextItemsIntoWords(textItems: TextItem[]): TextItem[] {
  */
 export async function annotatePdfWithSearchKeys(
 	pdfBuffer: Buffer,
-	locationBlocks: Array<{ block: string; searchKey?: string }>
+	locationBlocks: Array<{ block: string; searchKey?: string; warningMessage?: string }>
 ): Promise<Buffer> {
 	try {
 		const pdfDoc = await PDFDocument.load(pdfBuffer);
@@ -116,8 +122,9 @@ export async function annotatePdfWithSearchKeys(
 		const blocksPerPage = Math.ceil(locationBlocks.length / pages.length);
 
 		for (let i = 0; i < locationBlocks.length; i++) {
-			const { block, searchKey } = locationBlocks[i];
-			if (!searchKey) continue;
+			const { block, searchKey, warningMessage } = locationBlocks[i];
+			// Include all blocks - either with searchKey or warningMessage
+			if (!searchKey && !warningMessage) continue;
 
 			const pageIndex = Math.floor(i / blocksPerPage);
 			if (pageIndex >= pages.length) continue;
@@ -132,6 +139,7 @@ export async function annotatePdfWithSearchKeys(
 			annotations.push({
 				block,
 				searchKey,
+				warningMessage,
 				pageIndex,
 				xPosition: width * 0.7,
 				yPosition: Math.max(50, yPosition),
@@ -141,8 +149,9 @@ export async function annotatePdfWithSearchKeys(
 		// Add annotations to PDF
 		for (const annotation of annotations) {
 			const page = pages[annotation.pageIndex];
+			const textToDisplay = annotation.searchKey || annotation.warningMessage || '';
 			
-			page.drawText(annotation.searchKey, {
+			page.drawText(textToDisplay, {
 				x: annotation.xPosition,
 				y: annotation.yPosition,
 				size: fontSize,
@@ -280,7 +289,7 @@ function findBlockPosition(
  */
 export async function annotatePdfWithSearchKeysImproved(
 	pdfBuffer: Buffer,
-	locationBlocks: Array<{ block: string; searchKey?: string }>,
+	locationBlocks: Array<{ block: string; searchKey?: string; warningMessage?: string }>,
 	extractedText: string
 ): Promise<Buffer> {
 	try {
@@ -293,12 +302,28 @@ export async function annotatePdfWithSearchKeysImproved(
 
 		// Extract text with positions using pdfjs-dist (this will group characters into words)
 		const textItems = await extractTextWithPositions(pdfBuffer);
+		logger.info('Extracted text items from PDF', { 
+			textItemsCount: textItems.length,
+			pagesCount: pages.length 
+		});
 
 		// Create annotations with accurate positions
 		const annotations: LocationAnnotation[] = [];
 
-		for (const { block, searchKey } of locationBlocks) {
-			if (!searchKey) continue;
+		logger.info('Starting PDF annotation', { blocksCount: locationBlocks.length });
+		
+		for (const { block, searchKey, warningMessage } of locationBlocks) {
+			// Include all blocks - either with searchKey or warningMessage
+			if (!searchKey && !warningMessage) {
+				logger.debug('Skipping block (no searchKey or warningMessage)', { block: block.substring(0, 50) });
+				continue;
+			}
+
+			logger.debug('Processing block for annotation', { 
+				block: block.substring(0, 50), 
+				hasSearchKey: !!searchKey,
+				hasWarning: !!warningMessage 
+			});
 
 			// Try to find the block position on each page
 			let foundPosition: { x: number; y: number; pageIndex: number } | null = null;
@@ -312,10 +337,16 @@ export async function annotatePdfWithSearchKeysImproved(
 			}
 
 			if (!foundPosition) {
+				logger.debug('Block position not found via text matching, trying fallback', { 
+					block: block.substring(0, 50) 
+				});
 				// Fallback: use line-based estimation
 				const textLines = extractedText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 				const blockLines = block.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-				if (blockLines.length === 0) continue;
+				if (blockLines.length === 0) {
+					logger.warn('Block has no lines, skipping', { block: block.substring(0, 50) });
+					continue;
+				}
 
 				const firstLine = blockLines[0];
 				const lineIndex = textLines.findIndex(line =>
@@ -337,9 +368,24 @@ export async function annotatePdfWithSearchKeysImproved(
 						y: Math.max(50, Math.min(yPosition, height - 50)),
 						pageIndex,
 					};
+					logger.debug('Found block position via fallback', { 
+						pageIndex: foundPosition.pageIndex,
+						x: foundPosition.x,
+						y: foundPosition.y
+					});
 				} else {
+					logger.warn('Could not find block in extracted text, skipping annotation', { 
+						block: block.substring(0, 100),
+						firstLine: firstLine.substring(0, 50)
+					});
 					continue; // Skip if we can't find the block
 				}
+			} else {
+				logger.debug('Found block position via text matching', { 
+					pageIndex: foundPosition.pageIndex,
+					x: foundPosition.x,
+					y: foundPosition.y
+				});
 			}
 
 			// Get page dimensions to calculate right-side position
@@ -353,6 +399,7 @@ export async function annotatePdfWithSearchKeysImproved(
 			annotations.push({
 				block,
 				searchKey,
+				warningMessage,
 				pageIndex: foundPosition.pageIndex,
 				xPosition,
 				yPosition: foundPosition.y,
@@ -360,11 +407,25 @@ export async function annotatePdfWithSearchKeysImproved(
 		}
 
 		// Add annotations to PDF (this preserves the original structure)
-		// Make sure we're drawing the FULL search key string, not individual characters
+		// Make sure we're drawing the FULL search key string or warning message, not individual characters
+		logger.info('Adding annotations to PDF', { annotationsCount: annotations.length });
 		for (const annotation of annotations) {
 			const page = pages[annotation.pageIndex];
+			const textToDisplay = annotation.searchKey || annotation.warningMessage || '';
+			
+			if (!textToDisplay) {
+				logger.warn('Skipping annotation with empty text', { block: annotation.block.substring(0, 50) });
+				continue;
+			}
 
-			page.drawText(annotation.searchKey, {
+			logger.debug('Drawing annotation', { 
+				text: textToDisplay.substring(0, 50),
+				pageIndex: annotation.pageIndex,
+				x: annotation.xPosition,
+				y: annotation.yPosition
+			});
+
+			page.drawText(textToDisplay, {
 				x: annotation.xPosition,
 				y: annotation.yPosition,
 				size: fontSize,

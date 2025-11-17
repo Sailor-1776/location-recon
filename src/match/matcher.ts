@@ -94,9 +94,15 @@ function buildDiffs(doc: CanonicalAddress, db: LocationRecord): MatchResult['dif
 function departmentsMatch(doc: CanonicalAddress, rec: LocationRecord): boolean {
 	const docDept = (doc.department || '').toString().trim().toLowerCase();
 	const recDept = (rec.department || '').toString().trim().toLowerCase();
-	// If both have departments, they must match exactly
+	// If both have departments, use fuzzy matching with a threshold (85% similarity)
 	if (docDept && recDept) {
-		return docDept === recDept;
+		// First try exact match for efficiency
+		if (docDept === recDept) {
+			return true;
+		}
+		// Use fuzzy matching for similar department names
+		const similarity = fuzzball.token_sort_ratio(docDept, recDept);
+		return similarity >= 85;
 	}
 	// If both are missing, consider it a match
 	if (!docDept && !recDept) {
@@ -107,18 +113,46 @@ function departmentsMatch(doc: CanonicalAddress, rec: LocationRecord): boolean {
 }
 
 export async function reconcileOne(doc: CanonicalAddress, dao: LocationsDAO): Promise<MatchResult> {
+	const logger = getLogger();
 	const blockingKey = doc.postal_code
 		? { city: doc.city, state: doc.state, postal_code: doc.postal_code.slice(0, 5) }
 		: { city: doc.city, state: doc.state };
+	
+	logger.info('Finding candidates', {
+		blockingKey,
+		docName: doc.name,
+		docDepartment: doc.department
+	});
+	
 	const allCandidates = await dao.findCandidates(blockingKey);
+	
+	logger.info('Found candidates', {
+		candidatesCount: allCandidates.length,
+		sampleNames: allCandidates.slice(0, 5).map(c => c.name)
+	});
 	
 	// Step 1: Filter candidates by department first
 	// If doc has a department (non-empty), only consider records with matching department
 	// If doc has no department, consider all candidates
 	const docHasDepartment = doc.department && doc.department.toString().trim().length > 0;
 	const departmentFiltered = docHasDepartment
-		? allCandidates.filter((rec) => departmentsMatch(doc, rec))
+		? allCandidates.filter((rec) => {
+			const matches = departmentsMatch(doc, rec);
+			logger.debug('Department match check', {
+				docDept: doc.department,
+				recDept: rec.department,
+				recName: rec.name,
+				matches
+			});
+			return matches;
+		})
 		: allCandidates;
+	
+	logger.info('After department filtering', {
+		docHasDepartment,
+		departmentFilteredCount: departmentFiltered.length,
+		filteredNames: departmentFiltered.slice(0, 5).map(c => ({ name: c.name, dept: c.department }))
+	});
 	
 	// Step 2: Check for exact matches (name and address) within department-filtered candidates
 	for (const rec of departmentFiltered) {
@@ -167,7 +201,6 @@ export async function reconcileOne(doc: CanonicalAddress, dao: LocationsDAO): Pr
 	const status = decideStatus(best.scores);
 	
 	// Debug logging for matching issues
-	const logger = getLogger();
 	if (status !== 'EXACT') {
 		logger.info('Match result', {
 			status,

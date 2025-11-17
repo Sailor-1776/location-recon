@@ -9,6 +9,7 @@ import { getLogger } from '../../../../../utils/logger';
 import { isAddressExact, isNameExact } from '../../../../../match/scorers';
 import { extractText } from '../../../../../ingest/pdfReader';
 import { annotatePdfWithSearchKeysImproved } from '../../../../../ingest/pdfAnnotator';
+import { extractWarningMessage } from '../../../../../llm/assistant';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
@@ -108,7 +109,7 @@ export async function POST(req: NextRequest) {
 			}
 		}
 		const files = formData.getAll('files');
-		const pdfFiles: Array<{ file: File; buffer: Buffer; text: string; blocks: Array<{ block: string; searchKey?: string }> }> = [];
+		const pdfFiles: Array<{ file: File; buffer: Buffer; text: string; blocks: Array<{ block: string; searchKey?: string; warningMessage?: string }> }> = [];
 		
 		for (const f of files) {
 			if (!(f instanceof File)) continue;
@@ -141,9 +142,34 @@ export async function POST(req: NextRequest) {
 			}
 			
 			// Use structured facility extraction for PDFs, fallback to candidate blocks for other formats
-			const blocks = isPdf && text.trim() 
-				? extractStructuredFacilities(text) 
+			const blocks = isPdf && text.trim()
+				? extractStructuredFacilities(text)
 				: extractCandidateBlocks(text);
+
+			logger.info('Extracted blocks from file', {
+				fileName: f.name,
+				isPdf,
+				blocksCount: blocks.length,
+				textLength: text.length
+			});
+
+			// Debug: log extracted text content
+			if (isPdf) {
+				const lines = text.split(/\r?\n/);
+				logger.info('PDF text preview', {
+					fileName: f.name,
+					textLength: text.length,
+					lineCount: lines.length,
+					firstLines: lines.slice(0, 20).join('\n'),
+					// Look for medical record patterns
+					hasHospital: /hospital|medical|records|radiology/i.test(text),
+					hasAddresses: /\d+\s+[A-Za-z]+\s+(Street|St|Avenue|Ave|Road|Rd|Drive|Dr|Boulevard|Blvd)/gi.test(text),
+					hasPhone: /\(\d{3}\)\s*\d{3}[-]\d{4}/g.test(text),
+					hasDepartment: /radiology|records|billing|medical records/i.test(text),
+					// Show lines that might contain medical records
+					sampleLines: lines.slice(20, 50).join('\n')
+				});
+			}
 			
 			// Track PDF files and their location blocks for annotation
 			if (isPdf) {
@@ -157,28 +183,92 @@ export async function POST(req: NextRequest) {
 			
 			for (const block of blocks) {
 				try {
+					logger.info('Processing block', {
+						blockIndex: blocks.indexOf(block) + 1,
+						totalBlocks: blocks.length,
+						blockPreview: block.substring(0, 150)
+					});
 					const ca = normalizeAddress(block);
+					logger.info('Normalized address', {
+						normalized: ca
+					});
 					const match = await reconcileOne(ca, dao);
+					logger.info('Match result', {
+						blockPreview: block.substring(0, 50),
+						matchStatus: match.status,
+						hasRecord: !!match.record,
+						nameScore: match.scores?.name,
+						addressScore: match.scores?.address,
+						departmentScore: match.scores?.department,
+						recordName: match.record?.name,
+						recordDepartment: match.record?.department
+					});
 				const name_exact = !!(match.record && isNameExact(ca.name, match.record.name));
 				const address_exact = !!(match.record && isAddressExact(ca, match.record));
-				// Treat fuzzy EXACT as a found match (do not require strict equality)
-				const found = match.status === 'EXACT' && !!match.record;
-				const search_key =
-					found && match.record
-						? match.record.search_key ||
-						  canonicalKey({
-						  	name: match.record.name,
-						  	address1: match.record.address1,
-						  	city: match.record.city,
-						  	state: match.record.state,
-						  	postal_code: match.record.postal_code,
-						  })
-						: undefined;
+				// Treat fuzzy EXACT or CLOSE as a found match (department already checked before fuzzy matching)
+				// Department filtering happens in reconcileOne before fuzzy matching, so if we get a match, department already matches
+				const found = (match.status === 'EXACT' || match.status === 'CLOSE') && !!match.record;
+				
+				// Check department first: if matched record's department is "Non-Order", return full warning text instead of search key
+				const matchedDepartment = match.record ? (match.record.department || '').toString().trim().toLowerCase() : '';
+				const isNonOrder = matchedDepartment === 'non-order';
+				
+				let warningMessage: string | undefined = undefined;
+				let search_key: string | undefined = undefined;
+				
+				if (isNonOrder && match.record) {
+					// Department column says "Non-Order": return full warning text instead of search key
+					try {
+						const extractedWarning = await extractWarningMessage(match.record);
+						if (extractedWarning) {
+							warningMessage = extractedWarning;
+						} else {
+							// Fallback if no warning in record
+							warningMessage = match.record.warning || 'NON-ORDER: Research Required';
+						}
+					} catch (e: any) {
+						logger.warn('Failed to extract warning message', { error: e?.message });
+						warningMessage = match.record.warning || 'NON-ORDER: Research Required';
+					}
+					// Don't set search_key for Non-Order departments
+				} else if (found && match.record) {
+					// Department is not "Non-Order" and we have a match: return search key
+					// Return search key for both EXACT and CLOSE matches (department already verified in reconcileOne)
+					search_key =
+						match.record.search_key ||
+						canonicalKey({
+							name: match.record.name,
+							address1: match.record.address1,
+							city: match.record.city,
+							state: match.record.state,
+							postal_code: match.record.postal_code,
+						});
+				} else if (match.status === 'NEW') {
+					// No match found: annotate with research required message
+					warningMessage = 'RESEARCH REQUIRED';
+				}
 				
 				// Track blocks for PDF annotation
 				if (isPdf && pdfFiles.length > 0) {
 					const pdfFile = pdfFiles[pdfFiles.length - 1];
-					pdfFile.blocks.push({ block, searchKey: search_key });
+					// Only add blocks that have searchKey or warningMessage for annotation
+					if (search_key || warningMessage) {
+						logger.info('Adding block to PDF annotation', { 
+							block: block.substring(0, 100), 
+							searchKey: search_key,
+							hasWarning: !!warningMessage,
+							matchStatus: match.status 
+						});
+						pdfFile.blocks.push({ block, searchKey: search_key, warningMessage });
+					} else {
+						logger.info('Skipping block (no searchKey or warningMessage)', { 
+							block: block.substring(0, 100),
+							matchStatus: match.status,
+							hasRecord: !!match.record,
+							found: found,
+							isNonOrder: isNonOrder
+						});
+					}
 				}
 				
 				results.push(
@@ -204,6 +294,11 @@ export async function POST(req: NextRequest) {
 		// If we have exactly one PDF file, return the annotated PDF
 		if (pdfFiles.length === 1 && files.length === 1) {
 			const pdfFile = pdfFiles[0];
+			logger.info('Annotating PDF', { 
+				fileName: pdfFile.file.name, 
+				blocksCount: pdfFile.blocks.length,
+				blocksWithKeys: pdfFile.blocks.filter(b => b.searchKey || b.warningMessage).length
+			});
 			try {
 				const annotatedPdf = await annotatePdfWithSearchKeysImproved(
 					pdfFile.buffer,
@@ -211,6 +306,7 @@ export async function POST(req: NextRequest) {
 					pdfFile.text
 				);
 				
+				logger.info('PDF annotation successful', { fileName: pdfFile.file.name });
 				return new NextResponse(annotatedPdf, {
 					headers: {
 						'Content-Type': 'application/pdf',
@@ -218,7 +314,7 @@ export async function POST(req: NextRequest) {
 					},
 				});
 			} catch (e: any) {
-				logger.error('PDF annotation failed', { message: e?.message });
+				logger.error('PDF annotation failed', { message: e?.message, stack: e?.stack });
 				// Fall back to JSON response if annotation fails
 			}
 		}
