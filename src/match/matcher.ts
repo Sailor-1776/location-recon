@@ -30,6 +30,85 @@ export interface MatchResult {
 	record?: LocationRecord | null;
 }
 
+/**
+ * Normalizes department names to canonical forms to handle common variations.
+ * Examples:
+ * - "Radiology Records", "Radiology Dept.", "Radiology Department" -> "radiology"
+ * - "Medical Records", "Medical Record Department" -> "medical records"
+ * - "Billing Records", "Billing Department", "Billing" -> "billing"
+ * - "Patient Accounts", "Patient Account Department" -> "patient accounts"
+ */
+function normalizeDepartment(dept: string): string {
+	if (!dept) return '';
+	
+	const normalized = dept.toLowerCase().trim();
+	
+	// Remove common suffixes/prefixes and normalize abbreviations
+	const cleaned = normalized
+		.replace(/\b(dept|dept\.|department)\b/g, '')
+		.replace(/\b(records?|record)\b/g, '')
+		.trim();
+	
+	// Map core department names to canonical forms
+	const coreMappings: Record<string, string> = {
+		'radiology': 'radiology',
+		'medical': 'medical records',
+		'billing': 'billing',
+		'patient account': 'patient accounts',
+		'patient accounts': 'patient accounts',
+		'record': 'records department',
+		'records': 'records department',
+		'legal': 'legal department',
+		'human resource': 'human resources',
+		'human resources': 'human resources',
+		'hr': 'human resources',
+		'pharmacy': 'pharmacy',
+	};
+	
+	// Check for exact match in core mappings
+	if (coreMappings[cleaned]) {
+		return coreMappings[cleaned];
+	}
+	
+	// Check if cleaned string contains any core department name
+	for (const [key, value] of Object.entries(coreMappings)) {
+		if (cleaned.includes(key) || normalized.includes(key)) {
+			return value;
+		}
+	}
+	
+	// Special handling for common patterns
+	if (normalized.includes('radiology')) {
+		return 'radiology';
+	}
+	if (normalized.includes('medical') && (normalized.includes('record') || normalized.includes('records'))) {
+		return 'medical records';
+	}
+	if (normalized.includes('billing')) {
+		return 'billing';
+	}
+	if (normalized.includes('patient') && (normalized.includes('account') || normalized.includes('accounts'))) {
+		return 'patient accounts';
+	}
+	if (normalized.includes('record') || normalized.includes('records')) {
+		if (!normalized.includes('medical') && !normalized.includes('billing') && !normalized.includes('radiology')) {
+			return 'records department';
+		}
+	}
+	if (normalized.includes('legal')) {
+		return 'legal department';
+	}
+	if (normalized.includes('human resource') || normalized.includes('hr')) {
+		return 'human resources';
+	}
+	if (normalized.includes('pharmacy')) {
+		return 'pharmacy';
+	}
+	
+	// If no mapping found, return normalized version
+	return normalized;
+}
+
 function computeScores(
 	doc: CanonicalAddress,
 	db: LocationRecord,
@@ -43,11 +122,22 @@ function computeScores(
 	
 	// Compute department score if both have department values
 	let department: number | null = null;
-	const docDept = (doc.department || '').toString().trim().toLowerCase();
-	const dbDept = (db.department || '').toString().trim().toLowerCase();
-	if (docDept && dbDept) {
-		department = fuzzball.token_sort_ratio(docDept, dbDept);
-	} else if (!docDept && !dbDept) {
+	const docDept = (doc.department || '').toString().trim();
+	const dbDept = (db.department || '').toString().trim();
+	
+	// Normalize both department names to canonical forms
+	const normalizedDocDept = normalizeDepartment(docDept);
+	const normalizedDbDept = normalizeDepartment(dbDept);
+	
+	if (normalizedDocDept && normalizedDbDept) {
+		// If normalized forms match exactly, give perfect score
+		if (normalizedDocDept === normalizedDbDept) {
+			department = 100;
+		} else {
+			// Otherwise use fuzzy matching
+			department = fuzzball.token_sort_ratio(normalizedDocDept, normalizedDbDept);
+		}
+	} else if (!normalizedDocDept && !normalizedDbDept) {
 		// Both missing - consider it a match (neutral)
 		department = 100;
 	} else {
@@ -92,20 +182,25 @@ function buildDiffs(doc: CanonicalAddress, db: LocationRecord): MatchResult['dif
 }
 
 function departmentsMatch(doc: CanonicalAddress, rec: LocationRecord): boolean {
-	const docDept = (doc.department || '').toString().trim().toLowerCase();
-	const recDept = (rec.department || '').toString().trim().toLowerCase();
-	// If both have departments, use fuzzy matching with a threshold (85% similarity)
-	if (docDept && recDept) {
-		// First try exact match for efficiency
-		if (docDept === recDept) {
+	const docDept = (doc.department || '').toString().trim();
+	const recDept = (rec.department || '').toString().trim();
+	
+	// Normalize both department names to canonical forms
+	const normalizedDocDept = normalizeDepartment(docDept);
+	const normalizedRecDept = normalizeDepartment(recDept);
+	
+	// If both have departments, check for match
+	if (normalizedDocDept && normalizedRecDept) {
+		// First try exact match after normalization
+		if (normalizedDocDept === normalizedRecDept) {
 			return true;
 		}
-		// Use fuzzy matching for similar department names
-		const similarity = fuzzball.token_sort_ratio(docDept, recDept);
+		// Fallback to fuzzy matching with a threshold (85% similarity) for edge cases
+		const similarity = fuzzball.token_sort_ratio(normalizedDocDept, normalizedRecDept);
 		return similarity >= 85;
 	}
 	// If both are missing, consider it a match
-	if (!docDept && !recDept) {
+	if (!normalizedDocDept && !normalizedRecDept) {
 		return true;
 	}
 	// If one has department and the other doesn't, no match

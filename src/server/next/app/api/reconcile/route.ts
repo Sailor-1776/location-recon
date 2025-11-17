@@ -243,8 +243,8 @@ export async function POST(req: NextRequest) {
 							state: match.record.state,
 							postal_code: match.record.postal_code,
 						});
-				} else if (match.status === 'NEW') {
-					// No match found: annotate with research required message
+				} else {
+					// No match found (NEW status or edge case): annotate with research required message
 					warningMessage = 'RESEARCH REQUIRED';
 				}
 				
