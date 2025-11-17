@@ -8,24 +8,74 @@ import { canonicalKey } from '../../../../../types';
 import { getLogger } from '../../../../../utils/logger';
 import { isAddressExact, isNameExact } from '../../../../../match/scorers';
 import { extractText } from '../../../../../ingest/pdfReader';
+import { annotatePdfWithSearchKeysImproved } from '../../../../../ingest/pdfAnnotator';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 
+// Log that module loaded successfully
+console.log('[RECONCILE ROUTE] Module loaded successfully');
+
 export const runtime = 'nodejs';
 
+// Handle unhandled promise rejections at the module level
+if (typeof process !== 'undefined') {
+	process.on('unhandledRejection', (reason, promise) => {
+		console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+	});
+}
+
 export async function POST(req: NextRequest) {
-	const logger = getLogger();
+	// Wrap everything to ensure we always return JSON, even if logger initialization fails
+	let logger: ReturnType<typeof getLogger>;
 	try {
-		const formData = await req.formData();
-		const dao = getDAO(loadConfig().mr8Driver);
+		logger = getLogger();
+		logger.info('Reconcile route called');
+	} catch (e: any) {
+		// If logger fails, use console as fallback
+		console.error('Failed to initialize logger:', e?.message);
+		// Create a minimal logger
+		logger = {
+			info: (msg: string) => console.log(`[INFO] ${msg}`),
+			warn: (msg: string, meta?: any) => console.warn(`[WARN] ${msg}`, meta),
+			error: (msg: string, meta?: any) => console.error(`[ERROR] ${msg}`, meta),
+			debug: (msg: string, meta?: any) => console.debug(`[DEBUG] ${msg}`, meta),
+		} as ReturnType<typeof getLogger>;
+	}
+	
+	// Wrap in try-catch to catch any synchronous errors during initialization
+	try {
+		// Ensure we always return a response, even if there's an unhandled rejection
+		return await (async () => {
+			try {
+		let formData: FormData;
+		try {
+			formData = await req.formData();
+		} catch (e: any) {
+			logger.error('Failed to parse formData', { message: e?.message });
+			return NextResponse.json({ 
+				error: 'Bad Request',
+				message: `Failed to parse form data: ${e?.message || 'Unknown error'}`,
+			}, { status: 400 });
+		}
+		let dao: ReturnType<typeof getDAO>;
+		try {
+			dao = getDAO(loadConfig().mr8Driver);
+		} catch (e: any) {
+			logger.error('Failed to initialize DAO', { message: e?.message, stack: e?.stack });
+			return NextResponse.json({ 
+				error: 'Configuration Error',
+				message: `Failed to initialize database connection: ${e?.message || 'Unknown error'}`,
+			}, { status: 500 });
+		}
 		const results: any[] = [];
 		const inputText = formData.get('text');
 		if (typeof inputText === 'string' && inputText.trim()) {
 			const blocks = extractCandidateBlocks(inputText);
 			for (const block of blocks) {
-				const canonical = normalizeAddress(block);
-				const match = await reconcileOne(canonical, dao);
+				try {
+					const canonical = normalizeAddress(block);
+					const match = await reconcileOne(canonical, dao);
 				const name_exact = !!(match.record && isNameExact(canonical.name, match.record.name));
 				const address_exact = !!(match.record && isAddressExact(canonical, match.record));
 				// Treat fuzzy EXACT as a found match (do not require strict equality)
@@ -51,9 +101,15 @@ export async function POST(req: NextRequest) {
 					address_exact,
 					note: found ? undefined : 'User needs to conduct research.',
 				});
+				} catch (e: any) {
+					logger.error('Failed to process text block', { message: e?.message, block: block.substring(0, 100) });
+					// Continue processing other blocks
+				}
 			}
 		}
 		const files = formData.getAll('files');
+		const pdfFiles: Array<{ file: File; buffer: Buffer; text: string; blocks: Array<{ block: string; searchKey?: string }> }> = [];
+		
 		for (const f of files) {
 			if (!(f instanceof File)) continue;
 			const buf = Buffer.from(await f.arrayBuffer());
@@ -89,9 +145,20 @@ export async function POST(req: NextRequest) {
 				? extractStructuredFacilities(text) 
 				: extractCandidateBlocks(text);
 			
+			// Track PDF files and their location blocks for annotation
+			if (isPdf) {
+				pdfFiles.push({
+					file: f,
+					buffer: buf,
+					text,
+					blocks: [],
+				});
+			}
+			
 			for (const block of blocks) {
-				const ca = normalizeAddress(block);
-				const match = await reconcileOne(ca, dao);
+				try {
+					const ca = normalizeAddress(block);
+					const match = await reconcileOne(ca, dao);
 				const name_exact = !!(match.record && isNameExact(ca.name, match.record.name));
 				const address_exact = !!(match.record && isAddressExact(ca, match.record));
 				// Treat fuzzy EXACT as a found match (do not require strict equality)
@@ -107,6 +174,13 @@ export async function POST(req: NextRequest) {
 						  	postal_code: match.record.postal_code,
 						  })
 						: undefined;
+				
+				// Track blocks for PDF annotation
+				if (isPdf && pdfFiles.length > 0) {
+					const pdfFile = pdfFiles[pdfFiles.length - 1];
+					pdfFile.blocks.push({ block, searchKey: search_key });
+				}
+				
 				results.push(
 					{
 						file: f.name,
@@ -120,12 +194,82 @@ export async function POST(req: NextRequest) {
 						note: found ? undefined : 'User needs to conduct research.',
 					},
 				);
+				} catch (e: any) {
+					logger.error('Failed to process file block', { message: e?.message, file: f.name, block: block.substring(0, 100) });
+					// Continue processing other blocks
+				}
 			}
 		}
-		return NextResponse.json({ results });
+		
+		// If we have exactly one PDF file, return the annotated PDF
+		if (pdfFiles.length === 1 && files.length === 1) {
+			const pdfFile = pdfFiles[0];
+			try {
+				const annotatedPdf = await annotatePdfWithSearchKeysImproved(
+					pdfFile.buffer,
+					pdfFile.blocks,
+					pdfFile.text
+				);
+				
+				return new NextResponse(annotatedPdf, {
+					headers: {
+						'Content-Type': 'application/pdf',
+						'Content-Disposition': `attachment; filename="${pdfFile.file.name}"`,
+					},
+				});
+			} catch (e: any) {
+				logger.error('PDF annotation failed', { message: e?.message });
+				// Fall back to JSON response if annotation fails
+			}
+		}
+		
+		// For multiple files or non-PDF files, return JSON with results
+		// If we have PDFs but multiple files, include annotated PDFs as base64
+		const annotatedPdfs: Record<string, string> = {};
+		if (pdfFiles.length > 0) {
+			for (const pdfFile of pdfFiles) {
+				try {
+					const annotatedPdf = await annotatePdfWithSearchKeysImproved(
+						pdfFile.buffer,
+						pdfFile.blocks,
+						pdfFile.text
+					);
+					annotatedPdfs[pdfFile.file.name] = annotatedPdf.toString('base64');
+				} catch (e: any) {
+					logger.error('PDF annotation failed', { message: e?.message, file: pdfFile.file.name });
+				}
+			}
+		}
+		
+				return NextResponse.json({ results, annotatedPdfs: Object.keys(annotatedPdfs).length > 0 ? annotatedPdfs : undefined });
+			} catch (e: any) {
+				logger.error('Reconcile route failed', { message: e?.message, stack: e?.stack, name: e?.name, cause: e?.cause });
+				// Ensure we always return JSON, not HTML
+				return NextResponse.json({ 
+					error: 'Internal Server Error',
+					message: e?.message || 'Unknown error',
+					stack: process.env.NODE_ENV === 'development' ? e?.stack : undefined
+				}, { 
+					status: 500,
+					headers: {
+						'Content-Type': 'application/json',
+					}
+				});
+			}
+		})();
 	} catch (e: any) {
-		logger.error('Reconcile route failed', { message: e?.message });
-		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+		// Catch any errors that happen during the async wrapper
+		console.error('Fatal error in reconcile route:', e?.message, e?.stack);
+		return NextResponse.json({ 
+			error: 'Internal Server Error',
+			message: e?.message || 'Fatal error occurred',
+			stack: process.env.NODE_ENV === 'development' ? e?.stack : undefined
+		}, { 
+			status: 500,
+			headers: {
+				'Content-Type': 'application/json',
+			}
+		});
 	}
 }
 
