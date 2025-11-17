@@ -11,6 +11,7 @@ import {
 	fullDbAddressString,
 	isAddressExact,
 	isNameExact,
+	matchesDoctorPattern,
 	tokenSet,
 	tokenSort,
 } from './scorers';
@@ -115,7 +116,18 @@ function computeScores(
 ): { name: number; address: number; department: number | null; geodistance_m: number | null } {
 	const nameA = (doc.name || '').toString();
 	const nameB = db.name || '';
-	const name = fuzzball.token_sort_ratio(nameA, nameB);
+	
+	// Check for doctor pattern match first (e.g., "Rafath Quraishi MD" matches "Dr. Rafath Quraishi")
+	// If it matches, boost the score significantly
+	let name: number;
+	if (matchesDoctorPattern(nameA, nameB)) {
+		// Give a high score (98) for doctor pattern matches
+		name = 98;
+	} else {
+		// Otherwise use standard fuzzy matching
+		name = fuzzball.token_sort_ratio(nameA, nameB);
+	}
+	
 	const addrA = expandAbbrev(fullAddressString(doc));
 	const addrB = expandAbbrev(fullDbAddressString(db));
 	const address = fuzzball.token_set_ratio(addrA, addrB);
@@ -228,8 +240,9 @@ export async function reconcileOne(doc: CanonicalAddress, dao: LocationsDAO): Pr
 
 	// Step 1: Check for exact matches (name and address) FIRST, before department filtering
 	// Exact matches should always be returned regardless of department differences
+	// Also check for doctor pattern matches (e.g., "Rafath Quraishi MD" matches "Dr. Rafath Quraishi")
 	for (const rec of allCandidates) {
-		const nameExact = isNameExact(doc.name, rec.name);
+		const nameExact = isNameExact(doc.name, rec.name) || matchesDoctorPattern(doc.name, rec.name);
 		const addressExact = isAddressExact(doc, rec);
 
 		if (nameExact && addressExact) {
@@ -239,7 +252,8 @@ export async function reconcileOne(doc: CanonicalAddress, dao: LocationsDAO): Pr
 				docName: doc.name,
 				recName: rec.name,
 				docDept: doc.department,
-				recDept: rec.department
+				recDept: rec.department,
+				doctorPatternMatch: matchesDoctorPattern(doc.name, rec.name)
 			});
 			return {
 				status: 'EXACT',

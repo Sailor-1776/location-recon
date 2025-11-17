@@ -12,11 +12,11 @@ type PDFParseResult = {
 
 async function getPdfjsLib(): Promise<any | null> {
 	try {
-		// Avoid static analysis for optional targets; still resolve installed 'pdfjs-dist'
+		// Use legacy build for Node.js compatibility (avoids DOMMatrix errors)
 		// eslint-disable-next-line @typescript-eslint/no-implied-eval
 		const dynamicImport = new Function('m', 'return import(m)');
 		// @ts-expect-error any
-		const pdfjsLib = await dynamicImport('pdfjs-dist');
+		const pdfjsLib = await dynamicImport('pdfjs-dist/legacy/build/pdf');
 		// @ts-expect-error any
 		if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
 			// @ts-expect-error any
@@ -27,7 +27,7 @@ async function getPdfjsLib(): Promise<any | null> {
 		try {
 			const require = createRequire(import.meta.url);
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const fallback = require('pdfjs-dist');
+			const fallback = require('pdfjs-dist/legacy/build/pdf');
 			if (fallback && fallback.GlobalWorkerOptions) {
 				fallback.GlobalWorkerOptions.workerSrc = undefined as unknown as string;
 			}

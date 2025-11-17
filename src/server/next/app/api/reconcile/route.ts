@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { extractCandidateBlocks, extractStructuredFacilities } from '../../../../../ingest/textUtils';
+import { extractCandidateBlocks, extractStructuredFacilities, filterMedicalBlocks } from '../../../../../ingest/textUtils';
 import { normalizeAddress } from '../../../../../normalize/address';
 import { getDAO } from '../../../../../match/locationsDAO';
 import { loadConfig } from '../../../../../config';
@@ -149,6 +149,17 @@ export async function POST(req: NextRequest) {
 			if (isPdf && blocks.length === 0 && text.trim()) {
 				logger.warn('Structured facility extraction returned no blocks; falling back to candidate block extraction');
 				blocks = extractCandidateBlocks(text);
+			}
+			
+			// Filter blocks to only include those with medical/healthcare keywords
+			const blocksBeforeFilter = blocks.length;
+			blocks = filterMedicalBlocks(blocks);
+			if (blocksBeforeFilter > blocks.length) {
+				logger.info('Filtered blocks to medical/healthcare only', {
+					before: blocksBeforeFilter,
+					after: blocks.length,
+					filteredOut: blocksBeforeFilter - blocks.length
+				});
 			}
 
 			logger.info('Extracted blocks from file', {

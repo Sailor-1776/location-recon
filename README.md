@@ -95,9 +95,10 @@ Privacy and redaction
 Backends and dependencies
 -------------------------
 
-- Preferred address normalization: `node-postal` (libpostal). If not available, fallback to a robust ruleset.
+- Address normalization: Rule-based parser with street abbreviation expansion, unit normalization, and department extraction.
 - PDF text via `pdf-parse`. If low density and OCR available, `tesseract.js`. If neither are present, we degrade gracefully and return empty or partial text without failing tests.
 - SQL Server via `mssql` (tedious); ODBC via `odbc`. If not configured, CSV backend is used.
+- Note: Buffer deprecation warnings may appear from dependencies (e.g., tesseract.js) but do not affect functionality.
 
 Windows notes (SQL Server and ODBC)
 -----------------------------------

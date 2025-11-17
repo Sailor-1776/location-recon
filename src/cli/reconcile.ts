@@ -6,7 +6,7 @@ import { loadConfig } from '../config';
 import { getLogger } from '../utils/logger';
 import * as pdfReader from '../ingest/pdfReader';
 import * as emailReader from '../ingest/emailReader';
-import { extractCandidateBlocks } from '../ingest/textUtils';
+import { extractCandidateBlocks, filterMedicalBlocks } from '../ingest/textUtils';
 import { normalizeAddress } from '../normalize/address';
 import { getDAO } from '../match/locationsDAO';
 import { reconcileOne } from '../match/matcher';
@@ -83,7 +83,9 @@ export async function runCli(argv: string[]): Promise<number> {
 	const printedKeys = new Set<string>();
 	let total = 0;
 	for (const { file, text } of fileTexts) {
-		const blocks = extractCandidateBlocks(text);
+		let blocks = extractCandidateBlocks(text);
+		// Filter blocks to only include those with medical/healthcare keywords
+		blocks = filterMedicalBlocks(blocks);
 		for (const block of blocks.slice(0, opts.limit || blocks.length)) {
 			const ca = normalizeAddress(block);
 			const match = await reconcileOne(ca, dao);

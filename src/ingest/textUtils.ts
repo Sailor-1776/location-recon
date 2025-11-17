@@ -154,6 +154,117 @@ export function extractStructuredFacilities(text: string): string[] {
 	});
 }
 
+/**
+ * Checks if a block contains medical/healthcare-related keywords
+ */
+function containsMedicalKeywords(block: string): boolean {
+	const medicalKeywords = [
+		'hospital',
+		'dr.',
+		'dr ',
+		'doctor',
+		'medical',
+		'billing',
+		'radiology',
+		'pharmacy',
+		'pharmacist',
+		'clinic',
+		'healthcare',
+		'health care',
+		'physician',
+		'surgeon',
+		'nurse',
+		'nursing',
+		'emergency',
+		'er ',
+		'urgent care',
+		'laboratory',
+		'lab ',
+		'pathology',
+		'cardiology',
+		'orthopedic',
+		'pediatric',
+		'obstetric',
+		'gynecology',
+		'neurology',
+		'oncology',
+		'dermatology',
+		'psychiatry',
+		'mental health',
+		'therapy',
+		'rehabilitation',
+		'physical therapy',
+		'occupational therapy',
+		'medical records',
+		'health information',
+		'hims',
+		'm.d.',
+		'md ',
+		'd.o.',
+		'do ',
+		'p.a.',
+		'pa ',
+		'n.p.',
+		'np ',
+		'rn ',
+		'registered nurse',
+		'practice',
+		'facility',
+		'center',
+		'centre',
+		'medical center',
+		'health center',
+		'surgical',
+		'surgery',
+		'operating room',
+		'or ',
+		'icu',
+		'intensive care',
+		'x-ray',
+		'xray',
+		'mri',
+		'ct scan',
+		'ultrasound',
+		'mammography',
+		'diagnostic',
+		'imaging',
+		'pharmaceutical',
+		'prescription',
+		'medication',
+		'home health',
+		'hospice',
+		'nursing home',
+		'assisted living',
+		'skilled nursing',
+		'rehab',
+		'primary care',
+		'specialist',
+		'specialty',
+		'medical group',
+		'medical practice',
+		'group practice',
+		'private practice',
+		'medical office',
+		'outpatient',
+		'inpatient',
+		'ambulatory',
+		'procedure',
+		'treatment',
+		'patient',
+		'provider',
+	];
+
+	const blockLower = block.toLowerCase();
+	return medicalKeywords.some(keyword => blockLower.includes(keyword));
+}
+
+/**
+ * Filters blocks to only include those containing medical/healthcare keywords
+ */
+export function filterMedicalBlocks(blocks: string[]): string[] {
+	return blocks.filter(block => containsMedicalKeywords(block));
+}
+
 export function extractCandidateBlocks(text: string): string[] {
 	const lines = text
 		.split(/\r?\n/)

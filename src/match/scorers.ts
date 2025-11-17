@@ -86,6 +86,19 @@ export function computeScores(
 ): { name: number; address: number; geodistance_m: number | null } {
 	const nameA = (doc.name || '').toString();
 	const nameB = db.name || '';
+	
+	// Check for doctor pattern match first (e.g., "Rafath Quraishi MD" matches "Dr. Rafath Quraishi")
+	// If it matches, boost the score significantly
+	if (matchesDoctorPattern(nameA, nameB)) {
+		// Give a high score (98) for doctor pattern matches
+		const name = 98;
+		const addrA = expandAbbrev(fullAddressString(doc));
+		const addrB = expandAbbrev(fullDbAddressString(db));
+		const address = fuzzball.token_set_ratio(addrA, addrB);
+		return { name, address, geodistance_m: null };
+	}
+	
+	// Otherwise use standard fuzzy matching
 	const name = fuzzball.token_sort_ratio(nameA, nameB);
 
 	const addrA = expandAbbrev(fullAddressString(doc));
@@ -107,6 +120,66 @@ export function computeGeodistanceIfBoth(
 		);
 	}
 	return null;
+}
+
+/**
+ * Extracts first and last name from a name string, removing titles and suffixes.
+ * Examples:
+ * - "Rafath Quraishi MD" -> { first: "Rafath", last: "Quraishi" }
+ * - "Dr. Rafath Quraishi" -> { first: "Rafath", last: "Quraishi" }
+ * - "John Smith" -> { first: "John", last: "Smith" }
+ */
+export function extractFirstLastName(name?: string | null): { first: string; last: string } | null {
+	if (!name) return null;
+	
+	const cleaned = name
+		.toString()
+		.trim()
+		// Remove common prefixes
+		.replace(/^(dr\.?|doctor|mr\.?|mrs\.?|ms\.?|miss|prof\.?|professor)\s+/i, '')
+		// Remove common suffixes (handle optional comma before suffix, e.g., "Sobti, M.D." -> "Sobti")
+		.replace(/[,]?\s+(md|m\.?d\.?|do|d\.?o\.?|pa|p\.?a\.?|np|n\.?p\.?|phd|ph\.?d\.?|jr\.?|sr\.?|ii|iii|iv)$/i, '')
+		// Remove trailing commas and whitespace
+		.replace(/[,]\s*$/, '')
+		.trim();
+	
+	const parts = cleaned.split(/\s+/).filter(Boolean);
+	if (parts.length < 2) return null;
+	
+	// Assume first name is first part, last name is last part
+	// Handle middle names/initials by taking first and last
+	const first = parts[0];
+	const last = parts[parts.length - 1];
+	
+	return { first, last };
+}
+
+/**
+ * Checks if a CSV record name matches the "Dr. first_name last_name" pattern
+ * when compared to an input name.
+ * Returns true if the CSV name starts with "Dr." (or "Doctor") followed by
+ * the same first and last name as extracted from the input.
+ */
+export function matchesDoctorPattern(inputName?: string | null, csvName?: string | null): boolean {
+	if (!inputName || !csvName) return false;
+	
+	const inputParts = extractFirstLastName(inputName);
+	if (!inputParts) return false;
+	
+	const csvLower = csvName.toString().trim().toLowerCase();
+	// Check if CSV name starts with "dr." or "doctor" (already lowercase)
+	if (!/^(dr\.?|doctor)\s+/.test(csvLower)) return false;
+	
+	// Extract first/last from CSV name (after removing "Dr." prefix)
+	const csvWithoutPrefix = csvLower.replace(/^(dr\.?|doctor)\s+/, '').trim();
+	const csvParts = extractFirstLastName(csvWithoutPrefix);
+	if (!csvParts) return false;
+	
+	// Compare first and last names (case-insensitive)
+	return (
+		inputParts.first.toLowerCase() === csvParts.first.toLowerCase() &&
+		inputParts.last.toLowerCase() === csvParts.last.toLowerCase()
+	);
 }
 
 // Exact-match helpers for deterministic checks used by API routes/UX

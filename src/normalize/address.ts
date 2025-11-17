@@ -1,28 +1,6 @@
 import * as fuzzball from 'fuzzball';
 import { CanonicalAddress } from '../types';
 
-type MaybePostal = {
-	parseAddress?: (input: string) => Array<{ component: string; value: string }>;
-};
-
-let postal: MaybePostal | null = null;
-let postalChecked = false;
-
-function tryLoadPostal(): MaybePostal | null {
-	if (postalChecked) return postal;
-	postalChecked = true;
-	try {
-		// node-postal usage varies; commonly require('node-postal')('parser')
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const mod = require('node-postal')('parser');
-		postal = mod as MaybePostal;
-		return postal;
-	} catch {
-		postal = null;
-		return null;
-	}
-}
-
 const STREET_EXPANSIONS: Record<string, string> = {
 	st: 'street',
 	street: 'street',
@@ -115,7 +93,7 @@ const STATE_TO_ABBR: Record<string, string> = {
 function extractCityStateZip(line: string): { city: string; state: string; postal_code: string } | null {
 	// First try to match 2-letter state abbreviation: "City, ST 12345"
 	let m = line.match(/^(.+?),\s*([A-Za-z]{2})\s+(\d{5})(?:-\d{4})?$/);
-	if (m) {
+	if (m && m[1] && m[2] && m[3]) {
 		const city = m[1].trim();
 		const state = m[2].toUpperCase();
 		const postal_code = m[3];
@@ -124,7 +102,7 @@ function extractCityStateZip(line: string): { city: string; state: string; posta
 	
 	// Try to match full state name: "City, StateName 12345"
 	m = line.match(/^(.+?),\s*([A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d{5})(?:-\d{4})?$/i);
-	if (m) {
+	if (m && m[1] && m[2] && m[3]) {
 		const city = m[1].trim();
 		const stateName = m[2].toLowerCase().trim();
 		const postal_code = m[3];
@@ -155,7 +133,7 @@ function extractDepartment(line: string): string | null {
 	// - "MM/DD/YY to Present - Department Name"
 	const dateRangePattern = /^\d{1,2}\/\d{1,2}\/\d{2,4}\s+to\s+(?:Present|\d{1,2}\/\d{1,2}\/\d{2,4})\s*[–—-]\s*(.+)$/i;
 	const match = line.match(dateRangePattern);
-	if (match) {
+	if (match && match[1]) {
 		return match[1].trim();
 	}
 	
@@ -177,51 +155,7 @@ function extractDepartment(line: string): string | null {
 }
 
 export function normalizeAddress(block: string): CanonicalAddress {
-	// Attempt libpostal first if present
-	const parser = tryLoadPostal();
-	if (parser?.parseAddress) {
-		try {
-			const parts = parser.parseAddress(block);
-			const out: CanonicalAddress = {
-				address1: '',
-				address2: undefined,
-				city: '',
-				state: '',
-				postal_code: '',
-				country: 'US',
-			};
-			let name: string | undefined;
-			const tokenValues = new Map<string, string[]>();
-			for (const p of parts) {
-				const arr = tokenValues.get(p.component) || [];
-				arr.push(p.value);
-				tokenValues.set(p.component, arr);
-			}
-			// Compose fields
-			const house = (tokenValues.get('house_number') || []).join(' ');
-			const road = (tokenValues.get('road') || []).join(' ');
-			const unit = (tokenValues.get('unit') || []).join(' ');
-			const city = (tokenValues.get('city') || tokenValues.get('suburb') || []).join(' ');
-			const state = (tokenValues.get('state') || []).join(' ').toUpperCase();
-			const postcode = (tokenValues.get('postcode') || []).join(' ');
-			const country = (tokenValues.get('country') || ['US']).join(' ');
-			name = (tokenValues.get('category') || tokenValues.get('name') || [])[0];
-			const address1 = normalizeWhitespace(`${house} ${road}`.trim());
-			const address2 = unit ? `suite ${unit}` : undefined;
-			out.address1 = expandStreetTokens(address1.toLowerCase());
-			out.address2 = address2?.toLowerCase();
-			out.city = city;
-			out.state = state;
-			out.postal_code = postcode.slice(0, 5);
-			out.country = country || 'US';
-			if (name) (out as any).name = name;
-			return out;
-		} catch {
-			// fall through to fallback
-		}
-	}
-
-	// Fallback rule-based parser
+	// Rule-based parser for address normalization
 	const lines = block
 		.split(/\r?\n/)
 		.map((l) => l.trim())
@@ -236,7 +170,9 @@ export function normalizeAddress(block: string): CanonicalAddress {
 
 	// Identify city/state/zip line
 	for (let i = lines.length - 1; i >= 0; i--) {
-		const parsed = extractCityStateZip(lines[i]);
+		const line = lines[i];
+		if (!line) continue;
+		const parsed = extractCityStateZip(line);
 		if (parsed) {
 			city = parsed.city;
 			state = parsed.state;
@@ -246,9 +182,21 @@ export function normalizeAddress(block: string): CanonicalAddress {
 			const { line, unit } = normalizeUnit(addrLine);
 			address1 = line;
 			if (unit) address2 = `suite ${unit}`;
-			// Name likely the line before
+			// Name likely the line before address
 			const possibleName = lines[i - 2] || '';
-			if (possibleName && !/\d/.test(possibleName)) {
+			const possibleFacilityName = lines[i - 3] || '';
+			
+			// Check if possibleName looks like a doctor name (contains M.D., MD, D.O., DO, etc.)
+			const looksLikeDoctorName = possibleName && /,\s*(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?)/i.test(possibleName);
+			
+			// If we have both a facility name and a doctor name, prefer the doctor name
+			// because doctor names are more specific and reliable for matching
+			// (e.g., "Raul Marquez, MD" matches "Dr. Raul Marquez" better than facility name would)
+			if (looksLikeDoctorName && possibleName && !/\d/.test(possibleName)) {
+				name = possibleName;
+			} else if (possibleFacilityName && !/\d/.test(possibleFacilityName)) {
+				name = possibleFacilityName;
+			} else if (possibleName && !/\d/.test(possibleName)) {
 				name = possibleName;
 			}
 			break;
