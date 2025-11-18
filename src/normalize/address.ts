@@ -198,16 +198,24 @@ export function normalizeAddress(block: string): CanonicalAddress {
 				return nameLine.replace(/^\d+\.\s*/, '').trim();
 			};
 			
-			// Check if possibleName looks like a doctor name (contains M.D., MD, D.O., DO, etc.)
+			// Check if possibleName looks like a doctor name (contains M.D., MD, D.O., DO, D.C., DC, etc.)
 			const cleanedPossibleName = cleanNameLine(possibleName);
-			const looksLikeDoctorName = cleanedPossibleName && /,\s*(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?)/i.test(cleanedPossibleName);
+			const looksLikeDoctorName = cleanedPossibleName && /,\s*(M\.?D\.?|D\.?O\.?|D\.?C\.?|P\.?A\.?|N\.?P\.?)/i.test(cleanedPossibleName);
 			
-			// If we have both a facility name and a doctor name, prefer the doctor name
-			// because doctor names are more specific and reliable for matching
-			// (e.g., "Raul Marquez, MD" matches "Dr. Raul Marquez" better than facility name would)
+			// If we have both a facility name and a doctor name, prefer the facility name
+			// for matching against facility records in the database. The facility name is more
+			// reliable for matching facility records, while doctor names are better for person records.
 			// Also handle names that start with numbers (like "4. Elevate Health Clinics Jai Kumar, MD.")
-			if (looksLikeDoctorName && cleanedPossibleName) {
-				// Check if it contains digits that aren't part of a number prefix
+			const cleanedFacilityName = cleanNameLine(possibleFacilityName);
+			
+			if (cleanedFacilityName && looksLikeDoctorName) {
+				// We have both facility name and doctor name - prefer facility name for facility matching
+				const hasDigitsInFacilityName = /[0-9]/.test(cleanedFacilityName);
+				if (!hasDigitsInFacilityName) {
+					name = cleanedFacilityName;
+				}
+			} else if (looksLikeDoctorName && cleanedPossibleName) {
+				// Only doctor name present, use it
 				const hasDigitsInName = /[0-9]/.test(cleanedPossibleName);
 				if (!hasDigitsInName) {
 					name = cleanedPossibleName;
@@ -215,13 +223,10 @@ export function normalizeAddress(block: string): CanonicalAddress {
 			}
 			
 			// If we didn't set name yet, try facility name
-			if (!name) {
-				const cleanedFacilityName = cleanNameLine(possibleFacilityName);
-				if (cleanedFacilityName) {
-					const hasDigitsInName = /[0-9]/.test(cleanedFacilityName);
-					if (!hasDigitsInName) {
-						name = cleanedFacilityName;
-					}
+			if (!name && cleanedFacilityName) {
+				const hasDigitsInFacilityName = /[0-9]/.test(cleanedFacilityName);
+				if (!hasDigitsInFacilityName) {
+					name = cleanedFacilityName;
 				}
 			}
 			

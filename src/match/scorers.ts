@@ -138,7 +138,7 @@ export function extractFirstLastName(name?: string | null): { first: string; las
 		// Remove common prefixes
 		.replace(/^(dr\.?|doctor|mr\.?|mrs\.?|ms\.?|miss|prof\.?|professor)\s+/i, '')
 		// Remove common suffixes (handle optional comma before suffix, e.g., "Sobti, M.D." -> "Sobti")
-		.replace(/[,]?\s+(md|m\.?d\.?|do|d\.?o\.?|pa|p\.?a\.?|np|n\.?p\.?|phd|ph\.?d\.?|jr\.?|sr\.?|ii|iii|iv)$/i, '')
+		.replace(/[,]?\s+(md|m\.?d\.?|do|d\.?o\.?|dc|d\.?c\.?|pa|p\.?a\.?|np|n\.?p\.?|phd|ph\.?d\.?|jr\.?|sr\.?|ii|iii|iv)$/i, '')
 		// Remove trailing commas and whitespace
 		.replace(/[,]\s*$/, '')
 		.trim();
