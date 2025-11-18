@@ -126,6 +126,12 @@ function extractCityStateZip(line: string): { city: string; state: string; posta
 function extractDepartment(line: string): string | null {
 	if (!line || !line.trim()) return null;
 	
+	// Reject lines that look like facility names (start with number followed by facility name)
+	// Examples: "2. Christus Mother Frances Hospital", "3. East Texas Spine Institute"
+	if (/^\d+\.\s+[A-Z]/.test(line.trim())) {
+		return null;
+	}
+	
 	// Pattern: date range followed by dash/em-dash/en-dash and department name
 	// Matches formats like:
 	// - "MM/DD/YY to Present – Department Name"
@@ -138,7 +144,7 @@ function extractDepartment(line: string): string | null {
 	}
 	
 	// If no date range pattern, check if line looks like a department name
-	// (contains common department keywords and doesn't look like an address)
+	// (contains common department keywords and doesn't look like an address or facility name)
 	const departmentKeywords = [
 		'records', 'department', 'billing', 'radiology', 'legal', 'hr', 'human resources',
 		'medical records', 'health information', 'hims', 'compliance', 'administration'
@@ -186,19 +192,47 @@ export function normalizeAddress(block: string): CanonicalAddress {
 			const possibleName = lines[i - 2] || '';
 			const possibleFacilityName = lines[i - 3] || '';
 			
+			// Helper to clean name line (remove number prefix if present)
+			const cleanNameLine = (nameLine: string): string => {
+				// Remove number prefix like "4. " or "1. " from the start
+				return nameLine.replace(/^\d+\.\s*/, '').trim();
+			};
+			
 			// Check if possibleName looks like a doctor name (contains M.D., MD, D.O., DO, etc.)
-			const looksLikeDoctorName = possibleName && /,\s*(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?)/i.test(possibleName);
+			const cleanedPossibleName = cleanNameLine(possibleName);
+			const looksLikeDoctorName = cleanedPossibleName && /,\s*(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?)/i.test(cleanedPossibleName);
 			
 			// If we have both a facility name and a doctor name, prefer the doctor name
 			// because doctor names are more specific and reliable for matching
 			// (e.g., "Raul Marquez, MD" matches "Dr. Raul Marquez" better than facility name would)
-			if (looksLikeDoctorName && possibleName && !/\d/.test(possibleName)) {
-				name = possibleName;
-			} else if (possibleFacilityName && !/\d/.test(possibleFacilityName)) {
-				name = possibleFacilityName;
-			} else if (possibleName && !/\d/.test(possibleName)) {
-				name = possibleName;
+			// Also handle names that start with numbers (like "4. Elevate Health Clinics Jai Kumar, MD.")
+			if (looksLikeDoctorName && cleanedPossibleName) {
+				// Check if it contains digits that aren't part of a number prefix
+				const hasDigitsInName = /[0-9]/.test(cleanedPossibleName);
+				if (!hasDigitsInName) {
+					name = cleanedPossibleName;
+				}
 			}
+			
+			// If we didn't set name yet, try facility name
+			if (!name) {
+				const cleanedFacilityName = cleanNameLine(possibleFacilityName);
+				if (cleanedFacilityName) {
+					const hasDigitsInName = /[0-9]/.test(cleanedFacilityName);
+					if (!hasDigitsInName) {
+						name = cleanedFacilityName;
+					}
+				}
+			}
+			
+			// If still no name, try the possibleName line (cleaned)
+			if (!name && cleanedPossibleName) {
+				const hasDigitsInName = /[0-9]/.test(cleanedPossibleName);
+				if (!hasDigitsInName) {
+					name = cleanedPossibleName;
+				}
+			}
+			
 			break;
 		}
 	}
@@ -210,9 +244,15 @@ export function normalizeAddress(block: string): CanonicalAddress {
 		address1 = line;
 		if (unit) address2 = `suite ${unit}`;
 	}
-	// If no name, use first line that lacks numbers
+	// If no name, use first line that lacks numbers (after removing number prefixes)
 	if (!name) {
-		name = lines.find((l) => !/\d/.test(l));
+		const nameCandidate = lines.find((l) => {
+			const cleaned = l.replace(/^\d+\.\s*/, '').trim();
+			return cleaned && !/[0-9]/.test(cleaned);
+		});
+		if (nameCandidate) {
+			name = nameCandidate.replace(/^\d+\.\s*/, '').trim();
+		}
 	}
 
 	// Extract department from any line that matches department patterns

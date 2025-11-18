@@ -55,6 +55,12 @@ function hasUnit(line: string): boolean {
 function looksLikeDepartment(line: string): boolean {
 	if (!line || !line.trim()) return false;
 	
+	// Reject lines that look like facility names (start with number followed by facility name)
+	// Examples: "2. Christus Mother Frances Hospital", "3. East Texas Spine Institute"
+	if (/^\d+\.\s+[A-Z]/.test(line.trim())) {
+		return false;
+	}
+	
 	// Pattern: date range followed by dash/em-dash/en-dash and department name
 	const dateRangePattern = /^\d{1,2}\/\d{1,2}\/\d{2,4}\s+to\s+(?:Present|\d{1,2}\/\d{1,2}\/\d{2,4})\s*[–—-]\s*(.+)$/i;
 	if (dateRangePattern.test(line)) return true;
@@ -245,35 +251,53 @@ export function extractStructuredFacilities(text: string, pages?: PdfTextPage[])
 			
 			if (!hasValidAddress) continue;
 			
+			// Helper to clean name line (remove number prefix if present)
+			const cleanNameLine = (nameLine: string): string => {
+				if (!nameLine) return '';
+				return nameLine.replace(/^\d+\.\s*/, '').trim();
+			};
+			
 			// Determine the facility name line
 			// Check if potentialNameLine looks like a doctor name (contains M.D., MD, D.O., DO, etc.)
-			const looksLikeDoctorName = /,\s*(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?)/i.test(potentialNameLine);
+			// Clean the name line first to handle number prefixes
+			const cleanedPotentialName = cleanNameLine(potentialNameLine);
+			const looksLikeDoctorName = cleanedPotentialName && /,\s*(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?)/i.test(cleanedPotentialName);
 			
 			let nameLine: string;
 			let blockParts: string[];
 			
 			if (looksLikeDoctorName && potentialFacilityNameLine) {
 				// We have: facility name, doctor name, address, city/state/zip
-				nameLine = potentialFacilityNameLine;
-				blockParts = [nameLine, potentialNameLine, addressLine, cityStateZipLine];
+				// Clean facility name if it has a number prefix
+				nameLine = cleanNameLine(potentialFacilityNameLine);
+				if (!nameLine || !cleanedPotentialName) continue;
+				blockParts = [nameLine, cleanedPotentialName, addressLine, cityStateZipLine];
 			} else {
 				// Standard case: facility name, address, city/state/zip
-				nameLine = potentialNameLine;
-				// Name should not look like an address (no street numbers)
+				// Clean name if it has a number prefix
+				nameLine = cleanedPotentialName;
+				// Name should not look like an address (no street numbers at start)
+				// But allow names that had number prefixes (which we've now removed)
 				const hasValidName = nameLine && !/^\d+\s/.test(nameLine) && nameLine.length > 3;
 				if (!hasValidName) continue;
 				blockParts = [nameLine, addressLine, cityStateZipLine];
 			}
 			
+			// Stop if we encounter a line that looks like a new facility entry (starts with number)
+			// Examples: "2. Christus Mother Frances Hospital", "3. East Texas Spine Institute"
+			const phoneLooksLikeNewFacility = phoneLine && /^\d+\.\s+[A-Z]/.test(phoneLine.trim());
+			const deptLooksLikeNewFacility = departmentLine && /^\d+\.\s+[A-Z]/.test(departmentLine.trim());
+			
 			// Add phone if present (starts with P:, Phone:, Tel:, etc. or matches phone pattern)
-			if (phoneLine && /^P:?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/i.test(phoneLine)) {
+			// But skip if it looks like a new facility entry
+			if (phoneLine && !phoneLooksLikeNewFacility && /^P:?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/i.test(phoneLine)) {
 				blockParts.push(phoneLine);
 			}
 			
-			// Add department if present
-			if (looksLikeDepartment(departmentLine)) {
+			// Add department if present, but skip if it looks like a new facility entry
+			if (!deptLooksLikeNewFacility && looksLikeDepartment(departmentLine)) {
 				blockParts.push(departmentLine);
-			} else if (looksLikeDepartment(phoneLine) && !/^P:?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/i.test(phoneLine)) {
+			} else if (!phoneLooksLikeNewFacility && looksLikeDepartment(phoneLine) && !/^P:?\s*\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/i.test(phoneLine)) {
 				// Sometimes department is on the phone line if phone wasn't there
 				blockParts.push(phoneLine);
 			}

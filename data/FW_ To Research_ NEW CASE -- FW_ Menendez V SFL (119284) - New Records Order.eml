@@ -1,0 +1,903 @@
+Received: from MW4PR17MB4570.namprd17.prod.outlook.com (2603:10b6:303:bf::19)
+ by MN2PR17MB3120.namprd17.prod.outlook.com with HTTPS; Mon, 17 Nov 2025
+ 18:45:17 +0000
+Received: from SN6PR17MB2239.namprd17.prod.outlook.com (2603:10b6:805:4e::23)
+ by MW4PR17MB4570.namprd17.prod.outlook.com (2603:10b6:303:bf::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.9; Mon, 17 Nov
+ 2025 18:45:14 +0000
+Received: from SN6PR17MB2239.namprd17.prod.outlook.com
+ ([fe80::cb50:94e0:94a1:d02c]) by SN6PR17MB2239.namprd17.prod.outlook.com
+ ([fe80::cb50:94e0:94a1:d02c%3]) with mapi id 15.20.9343.009; Mon, 17 Nov 2025
+ 18:45:14 +0000
+From: "Blanton, Sharon" <sblanton@gulfstreamlegal.com>
+To: "Miller, Mike" <mmiller@gulfstreamlegal.com>
+Subject: FW: To Research: NEW CASE -- FW: Menendez V SFL (119284) - New
+ Records Order
+Thread-Topic: To Research: NEW CASE -- FW: Menendez V SFL (119284) - New
+ Records Order
+Thread-Index: AdxVl9BbWtyYN+UAT9OEjlbO4DCs5ACWn0EA
+X-MS-Exchange-MessageSentRepresentingType: 1
+Date: Mon, 17 Nov 2025 18:45:14 +0000
+Message-ID:
+	<SN6PR17MB2239CEAB64EB0B303CA29363D5C9A@SN6PR17MB2239.namprd17.prod.outlook.com>
+References:
+	<MN2PR17MB31206143D76E05D4F68D95B3ACCAA@MN2PR17MB3120.namprd17.prod.outlook.com>
+In-Reply-To:
+	<MN2PR17MB31206143D76E05D4F68D95B3ACCAA@MN2PR17MB3120.namprd17.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 04
+X-MS-Exchange-Organization-AuthSource: SN6PR17MB2239.namprd17.prod.outlook.com
+X-MS-Has-Attach: yes
+X-MS-Exchange-Organization-Network-Message-Id:
+	b7001d67-6566-4d02-d3a6-08de26097208
+X-MS-Exchange-Organization-SCL: 1
+X-MS-TNEF-Correlator:
+X-MS-Exchange-Organization-RecordReviewCfmType: 0
+x-ms-publictraffictype: Email
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=gulfstreamlegal.com;
+x-ms-office365-filtering-correlation-id: b7001d67-6566-4d02-d3a6-08de26097208
+x-ms-traffictypediagnostic:
+	SN6PR17MB2239:EE_|MW4PR17MB4570:EE_|MN2PR17MB3120:EE_
+x-microsoft-antispam:
+	BCL:0;ARA:13230040|366016|7053199007|4013099003|8096899003|41050700001;
+x-forefront-antispam-report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR17MB2239.namprd17.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7053199007)(4013099003)(8096899003)(41050700001);DIR:INT;
+x-ms-exchange-crosstenant-originalarrivaltime: 17 Nov 2025 18:45:14.2484 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: e64b8cad-d81e-461f-9e6f-2539d215e7ba
+x-ms-exchange-crosstenant-authsource: SN6PR17MB2239.namprd17.prod.outlook.com
+x-ms-exchange-crosstenant-authas: Internal
+x-ms-exchange-crosstenant-network-message-id:
+	b7001d67-6566-4d02-d3a6-08de26097208
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname:
+	EjVrmNgPn32fBOiwnkd4tK0HsdTQWZwhml75iqURu1ezXX2y4ZUawQDr9DHj8//4yZYr1yQqG4zQaDHt/cvOD3WLEs4dQ/hwu4U+THuvLXc=
+x-ms-exchange-transport-crosstenantheadersstamped: MW4PR17MB4570
+x-ms-exchange-transport-endtoendlatency: 00:00:03.7445971
+x-ms-exchange-processed-by-bccfoldering: 15.20.9343.009
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;auth:0;dest:I;ENG:(910005)(944506478)(944626604)(920097)(425001)(930097)(140003)(1420198);
+X-Microsoft-Antispam-Message-Info:
+	fY8QK1OBBWQpEa1o/PmvglJd9hS6vFpGpL8+SoDW5zqRhlhOUxHNBw5UcSR4rxY1vHXkvnBZrpAHFmqWoU4+DT1nUznvsVUvAEXg1nLOIg6U8FdUIVXEmcFGzZnEEb/c07rw0lnKIunpxYamSOoTCif87kq4GgN/HF38V2BtzKaHmvKG1uIpNTUs/KtfVjWYGLrkG2IaTN35d8XWdSL+4MgFZwZZOlzcNvhgR2d1TlEavQv7UXYl2UPm3Eo8yl+sbr4od3tBRMrwGj/vtM83tNY8Cum9nZ7EunXWU6wTxw2NntxOycjVD2Ezq6L/WAWvkQcYuCdUb1gmh5EGFkL2EaegoTqv/kJiMXWttcEh/59kzMNQZ+74d6Z0F/GTETnAPlpbo9D3sXkgCsFs2J1JRIzz4c5jDdMDUl3TOluOLSLIZijvcScEYRdQaBOgKIkrRf1447o5dG0Fiq/U4f1ly0jNWmEftSvXdGVofsBaAYZuQWge7kgcON/rdtke+EjWwAJrNsi1GEbZRHVRagkTMKn9pJabg3O/vgSPqFq0UEAC1/5Lag56AD2R1YLX0qLdZgcnBMdFcR6dHs3y1Cq/K/pnugNNxq+VjX6pylBjduwANmTZdzN25BV5FIzCa4A1rdKLGfw2Znlu8lzyB+lJSR5QKGvMDOpRrzPM1dZXDsDDiCY4WSDXjs/lALoe2+cEYtKdfwG1oqz0H4azxowUTqGe8qKqw3clvRw4wi5uV09OX7FkjUPmSUPiBoTRtO0fbNxCkRgvRhdnzHpIuHyjT3uGkJksL6iERaXd8oWn4H/W1i4yrIaW1vyyYKM69aLqATPa3hbtUccVMYBQRuinvA==
+Content-Type: multipart/related;
+	boundary="_004_SN6PR17MB2239CEAB64EB0B303CA29363D5C9ASN6PR17MB2239namp_";
+	type="multipart/alternative"
+MIME-Version: 1.0
+
+--_004_SN6PR17MB2239CEAB64EB0B303CA29363D5C9ASN6PR17MB2239namp_
+Content-Type: multipart/alternative;
+	boundary="_000_SN6PR17MB2239CEAB64EB0B303CA29363D5C9ASN6PR17MB2239namp_"
+
+--_000_SN6PR17MB2239CEAB64EB0B303CA29363D5C9ASN6PR17MB2239namp_
+Content-Type: text/plain; charset="us-ascii"
+
+
+
+From: Miller, Mike <mmiller@gulfstreamlegal.com>
+Sent: Friday, November 14, 2025 12:53 PM
+To: Blanton, Sharon <sblanton@gulfstreamlegal.com>
+Subject: To Research: NEW CASE -- FW: Menendez V SFL (119284) - New Records Order
+
+Location below
+
+
+From: Schleppy, Patricia <pschleppy@gulfstreamlegal.com<mailto:pschleppy@gulfstreamlegal.com>>
+Sent: Friday, November 14, 2025 10:35 AM
+To: Miller, Mike <mmiller@gulfstreamlegal.com<mailto:mmiller@gulfstreamlegal.com>>
+Cc: Reed, Mark <mreed@gulfstreamlegal.com<mailto:mreed@gulfstreamlegal.com>>
+Subject: NEW CASE -- FW: Menendez V SFL (119284) - New Records Order
+
+Claim file records
+
+From: Jacol Standley <jstandley@germer.com<mailto:jstandley@germer.com>>
+Sent: Friday, November 14, 2025 9:44 AM
+To: Schleppy, Patricia <pschleppy@gulfstreamlegal.com<mailto:pschleppy@gulfstreamlegal.com>>
+Cc: Reed, Mark <mreed@gulfstreamlegal.com<mailto:mreed@gulfstreamlegal.com>>; Cameron Wilson <cwilson@germer.com<mailto:cwilson@germer.com>>; Celine Razo <crazo@germer.com<mailto:crazo@germer.com>>
+Subject: Menendez V SFL (119284) - New Records Order
+
+Good morning Patricia,
+
+I need to order claim files from North American QBE. Below are the specific claims.    QBENORTHAMERICA
+                                                                        unable to locate North American QBE, but I think the correct name is QBE North America
+
+  *   QBE Policy# 833696NEXP1
+
+DOL: 05/18/2021
+
+Adjuster: Jay Crawley
+
+Ph: 972-398-6378
+
+Reported Roof Leaks
+
+
+  *   QBE Policy# 833691NEXP1
+
+DOL: 11/19/2021
+
+Adjuster: Amira Howard
+
+Ph: 972-398-8559
+
+Reported water damage to Kitchen cabinets from dishwasher leak
+
+
+  *   QBE Policy# 860773NEXP1
+
+DOL: 06/26/2022
+
+Adjuster: Sally Andrade
+
+Ph: 608-478-6297
+
+Reported water damage to kitchen ceiling
+
+Civil Action No. 4:25-cv-00954; Tania V. Menendez vs. State Farm Lloyds; In the United States District Court, Southern District of Texas, Houston Division
+
+CASE/CLAIM INFORMATION:
+Claim #: 53-71J9-14M (DOL: 5/13/24 Fort Bend)
+Claim #: 53-70N6-19P (DOL: 7/7/24 Fort Bend)
+Policy #: 83-GW-Z408-4
+ECLS No. 2025-02400
+Effective Dates: 02-01-24 to 02-01-25
+
+CLIENT INFORMATION:
+Jodi Whalen
+State Farm Insurance Companies Corporate Headquarters
+One State Farm Plaza, B-3
+Bloomington, IL 61710-0001
+Phone: (309) 766-9835
+jodi.whalen.u8ne@statefarm.com<mailto:jodi.whalen.u8ne@statefarm.com>
+
+ATTORNEYS'
+NAME/ADDRESS
+PHONE/FAX NOS./
+EMAILS
+REPRESENTATION
+Plaintiff
+
+
+Juan A. Solis
+Gabriel Perez
+Gregory J. Finney
+Law Offices of Manuel Solis, PC
+6705 Navigation Blvd.
+Houston, Texas 77011
+
+SBN: 24103040 (JAS)
+TXSD: 3364212
+
+SBN: 24122641 (GP)
+TXSD: 3685189
+
+SBN: 24044430 (GJF)
+TXSD: 611329
+
+(713) 277-7838 - Telephone
+(713) 583-0541 - Facsimile
+jusolis@manuelsolis.com<mailto:jusolis@manuelsolis.com>
+gperez@manuelsolis.com<mailto:gperez@manuelsolis.com>
+gfinney@manuelsolis.com<mailto:gfinney@manuelsolis.com>
+
+Paralegal:
+Eveliz Cruz Colon
+ecruz@manuelsolis.com<mailto:ecruz@manuelsolis.com>
+
+Hilda Pavez
+hpavez@manuelsolis.com<mailto:hpavez@manuelsolis.com>
+
+
+Tania V. Menendez
+Defendants
+
+
+Dale M. "Rett" Holidy
+Cameron Wilson
+Germer PLLC
+America Tower
+2929 Allen Parkway, Suite 2900
+Houston, Texas 77019
+(713) 650-1313 - Telephone
+(713) 739-7420 - Facsimile
+State Farm Lloyds
+
+
+
+
+
+
+
+[germer 2]
+
+Jacol Standley
+Germer PLLC
+2929 Allen Pkwy, Suite 2900
+Houston, Texas 77019
+713.650.1313 Main
+713.830.9868 Direct
+713.739.7420 Fax
+jstandley@germer.com<mailto:jstandley@germer.com>
+
+PRIVILEGED & CONFIDENTIAL COMMUNICATION: This e-mail and any files transmitted with it is confidential and is intended solely for the use of the individual or entity to whom they are addressed.  This communication may contain material protected by the Attorney-Client privilege and/or constitute attorney work product.  If you are not the intended recipient or the person responsible for delivering the e-mail to the intended recipient, be advised that you have received this e-mail in error and that any use, dissemination, forwarding, printing, or copying of this e-mail is strictly prohibited.  If you have received this e-mail in error, please immediately notify us by telephone at (409) 654-6700, (713) 650-1313, or (512) 472-0288 or return by e-mail to: postmaster@germer.com<blocked::mailto:postmaster@germer.com>.  You will be reimbursed for reasonable costs incurred in notifying us.
+
+Caution: This is an external email. Please use caution when clicking links or opening attachments. When in doubt, contact security@gulfstreamlegal.com<mailto:security@gulfstreamlegal.com>
+
+
+--_000_SN6PR17MB2239CEAB64EB0B303CA29363D5C9ASN6PR17MB2239namp_
+Content-Type: text/html; charset="us-ascii"
+
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns:m="http://schemas.microsoft.com/office/2004/12/omml" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<meta name="Generator" content="Microsoft Word 15 (filtered medium)">
+<!--[if !mso]><style>v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style><![endif]--><style><!--
+/* Font Definitions */
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:Aptos;}
+@font-face
+	{font-family:"Californian FB";
+	panose-1:2 7 4 3 6 8 11 3 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	font-size:12.0pt;
+	font-family:"Aptos",sans-serif;
+	mso-ligatures:standardcontextual;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#467886;
+	text-decoration:underline;}
+p.MsoListParagraph, li.MsoListParagraph, div.MsoListParagraph
+	{mso-style-priority:34;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	font-size:12.0pt;
+	font-family:"Aptos",sans-serif;
+	mso-ligatures:standardcontextual;}
+span.EmailStyle22
+	{mso-style-type:personal-reply;
+	font-family:"Aptos",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-size:10.0pt;
+	mso-ligatures:none;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+/* List Definitions */
+@list l0
+	{mso-list-id:663898506;
+	mso-list-template-ids:-556384376;}
+@list l0:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l0:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l1
+	{mso-list-id:684211737;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-651899088 568085816 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l1:level1
+	{mso-level-start-at:1229;
+	mso-level-number-format:bullet;
+	mso-level-text:-;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:21.0pt;
+	text-indent:-.25in;
+	font-family:"Arial",sans-serif;
+	mso-fareast-font-family:Aptos;}
+@list l1:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:57.0pt;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l1:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:93.0pt;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l1:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:129.0pt;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l1:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:165.0pt;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l1:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:201.0pt;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l1:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:237.0pt;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l1:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:o;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:273.0pt;
+	text-indent:-.25in;
+	font-family:"Courier New";}
+@list l1:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0A7;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:309.0pt;
+	text-indent:-.25in;
+	font-family:Wingdings;}
+@list l2
+	{mso-list-id:1142162932;
+	mso-list-template-ids:970251062;}
+@list l2:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l2:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3
+	{mso-list-id:1401244702;
+	mso-list-template-ids:-1048674554;}
+@list l3:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level2
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level3
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level4
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level5
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:2.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level6
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level7
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:3.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level8
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+@list l3:level9
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	mso-ansi-font-size:10.0pt;
+	font-family:Symbol;}
+ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+--></style>
+</head>
+<body lang="EN-US" link="#467886" vlink="#96607D" style="word-wrap:break-word">
+<div class="WordSection1">
+<p class="MsoNormal"><span style="font-size:11.0pt"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span style="font-size:11.0pt"><o:p>&nbsp;</o:p></span></p>
+<div>
+<div style="border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in 0in 0in">
+<p class="MsoNormal"><b><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif;mso-ligatures:none">From:</span></b><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif;mso-ligatures:none"> Miller, Mike &lt;mmiller@gulfstreamlegal.com&gt;
+<br>
+<b>Sent:</b> Friday, November 14, 2025 12:53 PM<br>
+<b>To:</b> Blanton, Sharon &lt;sblanton@gulfstreamlegal.com&gt;<br>
+<b>Subject:</b> To Research: NEW CASE -- FW: Menendez V SFL (119284) - New Records Order<o:p></o:p></span></p>
+</div>
+</div>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal"><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif">Location below<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<div>
+<div style="border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in 0in 0in">
+<p class="MsoNormal"><b><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif;mso-ligatures:none">From:</span></b><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif;mso-ligatures:none"> Schleppy, Patricia &lt;<a href="mailto:pschleppy@gulfstreamlegal.com">pschleppy@gulfstreamlegal.com</a>&gt;
+<br>
+<b>Sent:</b> Friday, November 14, 2025 10:35 AM<br>
+<b>To:</b> Miller, Mike &lt;<a href="mailto:mmiller@gulfstreamlegal.com">mmiller@gulfstreamlegal.com</a>&gt;<br>
+<b>Cc:</b> Reed, Mark &lt;<a href="mailto:mreed@gulfstreamlegal.com">mreed@gulfstreamlegal.com</a>&gt;<br>
+<b>Subject:</b> NEW CASE -- FW: Menendez V SFL (119284) - New Records Order<o:p></o:p></span></p>
+</div>
+</div>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal"><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif">Claim file records
+<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<div>
+<div style="border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in 0in 0in">
+<p class="MsoNormal"><b><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif;mso-ligatures:none">From:</span></b><span style="font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif;mso-ligatures:none"> Jacol Standley &lt;<a href="mailto:jstandley@germer.com">jstandley@germer.com</a>&gt;
+<br>
+<b>Sent:</b> Friday, November 14, 2025 9:44 AM<br>
+<b>To:</b> Schleppy, Patricia &lt;<a href="mailto:pschleppy@gulfstreamlegal.com">pschleppy@gulfstreamlegal.com</a>&gt;<br>
+<b>Cc:</b> Reed, Mark &lt;<a href="mailto:mreed@gulfstreamlegal.com">mreed@gulfstreamlegal.com</a>&gt;; Cameron Wilson &lt;<a href="mailto:cwilson@germer.com">cwilson@germer.com</a>&gt;; Celine Razo &lt;<a href="mailto:crazo@germer.com">crazo@germer.com</a>&gt;<br>
+<b>Subject:</b> Menendez V SFL (119284) - New Records Order<o:p></o:p></span></p>
+</div>
+</div>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">Good morning Patricia,
+<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">I need to order
+<span style="background:yellow;mso-highlight:yellow">claim files from North American QBE</span>. Below are the specific claims.&nbsp;&nbsp;&nbsp;
+</span><b><span style="font-family:&quot;Calibri&quot;,sans-serif;color:#EE0000">QBENORTHAMERICA</span></b><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style="font-family:&quot;Calibri&quot;,sans-serif;color:#EE0000">unable to locate North American QBE, but I think the correct name is QBE North America</span><span style="font-family:&quot;Calibri&quot;,sans-serif"><o:p></o:p></span></p>
+<ul style="margin-top:0in" type="disc">
+<li class="MsoListParagraph" style="margin-left:-15.0pt;mso-list:l1 level1 lfo3">
+<span style="font-family:&quot;Arial&quot;,sans-serif">QBE Policy# 833696NEXP1<o:p></o:p></span></li></ul>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">DOL: 05/18/2021<o:p></o:p></span></p>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">Adjuster: Jay Crawley<o:p></o:p></span></p>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">Ph: 972-398-6378<o:p></o:p></span></p>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">Reported Roof Leaks<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<ul style="margin-top:0in" type="disc">
+<li class="MsoListParagraph" style="margin-left:-15.0pt;mso-list:l1 level1 lfo3">
+<span style="font-family:&quot;Arial&quot;,sans-serif">QBE Policy# 833691NEXP1<o:p></o:p></span></li></ul>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">DOL: 11/19/2021<o:p></o:p></span></p>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">Adjuster: Amira Howard<o:p></o:p></span></p>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">Ph: 972-398-8559<o:p></o:p></span></p>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">Reported water damage to Kitchen cabinets from dishwasher leak<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<ul style="margin-top:0in" type="disc">
+<li class="MsoListParagraph" style="margin-left:-15.0pt;mso-list:l1 level1 lfo3">
+<span style="font-family:&quot;Arial&quot;,sans-serif">QBE Policy# 860773NEXP1<o:p></o:p></span></li></ul>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">DOL: 06/26/2022<o:p></o:p></span></p>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">Adjuster: Sally Andrade<o:p></o:p></span></p>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">Ph: 608-478-6297<o:p></o:p></span></p>
+<p class="MsoListParagraph" style="margin-left:21.0pt"><span style="font-family:&quot;Arial&quot;,sans-serif">Reported water damage to kitchen ceiling<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">Civil Action No. 4:25-cv-00954;<i> Tania V. Menendez vs. State Farm Lloyds</i>; In the United States District Court, Southern District of Texas, Houston Division<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><b><u><span style="font-family:&quot;Arial&quot;,sans-serif">CASE/CLAIM INFORMATION:<o:p></o:p></span></u></b></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">Claim #: 53-71J9-14M (DOL: 5/13/24 Fort Bend)<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">Claim #: 53-70N6-19P (DOL: 7/7/24 Fort Bend)<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">Policy #: 83-GW-Z408-4<o:p></o:p></span></p>
+<p class="MsoNormal"><span lang="ES-MX" style="font-family:&quot;Arial&quot;,sans-serif">ECLS No. 2025-02400</span><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">Effective Dates: 02-01-24 to 02-01-25<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><b><u><span style="font-family:&quot;Arial&quot;,sans-serif">CLIENT INFORMATION:</span></u></b><span style="font-family:&quot;Arial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;
+<b><u><o:p></o:p></u></b></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">Jodi Whalen <o:p>
+</o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">State Farm Insurance Companies Corporate Headquarters
+<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">One State Farm Plaza, B-3<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">Bloomington, IL 61710-0001<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif">Phone: (309) 766-9835<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><a href="mailto:jodi.whalen.u8ne@statefarm.com">jodi.whalen.u8ne@statefarm.com</a>
+<o:p></o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<table class="MsoNormalTable" border="0" cellspacing="0" cellpadding="0" width="638" style="width:478.5pt;border-collapse:collapse">
+<tbody>
+<tr>
+<td width="276" valign="top" style="width:206.75pt;border:solid windowtext 1.0pt;background:#D9D9D9;padding:0in 5.4pt 0in 5.4pt">
+<p class="MsoNormal" align="center" style="text-align:center;line-height:105%;text-autospace:none">
+<b><span style="font-family:&quot;Times New Roman&quot;,serif;color:black;mso-ligatures:none">ATTORNEYS&#8217;</span></b><b><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></b></p>
+<p class="MsoNormal" align="center" style="text-align:center;line-height:105%;text-autospace:none">
+<b><span style="font-family:&quot;Times New Roman&quot;,serif;color:black;mso-ligatures:none">NAME/ADDRESS</span></b><b><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></b></p>
+</td>
+<td width="204" valign="top" style="width:153.0pt;border:solid windowtext 1.0pt;border-left:none;background:#D9D9D9;padding:0in 5.4pt 0in 5.4pt">
+<p class="MsoNormal" align="center" style="text-align:center;line-height:105%;text-autospace:none">
+<b><span style="font-family:&quot;Times New Roman&quot;,serif;color:black;mso-ligatures:none">PHONE/FAX NOS./</span></b><b><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></b></p>
+<p class="MsoNormal" align="center" style="text-align:center;line-height:105%;text-autospace:none">
+<b><span style="font-family:&quot;Times New Roman&quot;,serif;color:black;mso-ligatures:none">EMAILS</span></b><b><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></b></p>
+</td>
+<td width="159" valign="top" style="width:119.05pt;border:solid windowtext 1.0pt;border-left:none;background:#D9D9D9;padding:0in 5.4pt 0in 5.4pt">
+<p class="MsoNormal" align="center" style="text-align:center;line-height:105%;text-autospace:none">
+<b><span style="font-family:&quot;Times New Roman&quot;,serif;color:black;mso-ligatures:none">REPRESENTATION</span></b><b><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></b></p>
+</td>
+</tr>
+<tr style="height:12.1pt">
+<td width="276" valign="top" style="width:206.75pt;border:solid windowtext 1.0pt;border-top:none;background:#CCCCCC;padding:0in 5.4pt 0in 5.4pt;height:12.1pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><b><span style="font-family:&quot;Times New Roman&quot;,serif;color:black;mso-ligatures:none">Plaintiff</span></b><b><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></b></p>
+</td>
+<td width="204" valign="top" style="width:153.0pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;background:#CCCCCC;padding:0in 5.4pt 0in 5.4pt;height:12.1pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+</td>
+<td width="159" valign="top" style="width:119.05pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;background:#CCCCCC;padding:0in 5.4pt 0in 5.4pt;height:12.1pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+</td>
+</tr>
+<tr>
+<td width="276" valign="top" style="width:206.75pt;border:solid windowtext 1.0pt;border-top:none;padding:0in 5.4pt 0in 5.4pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><a name="_Hlk51845958"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Juan A. Solis<o:p></o:p></span></a></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="mso-bookmark:_Hlk51845958"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Gabriel Perez<o:p></o:p></span></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="mso-bookmark:_Hlk51845958"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Gregory J. Finney<o:p></o:p></span></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="mso-bookmark:_Hlk51845958"><span style="font-family:&quot;Times New Roman&quot;,serif;font-variant:small-caps;mso-ligatures:none">Law Offices of Manuel Solis, PC</span></span><span style="font-family:&quot;Times New Roman&quot;,serif;font-variant:small-caps;mso-ligatures:none"><o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><a name="_Hlk190178509"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">6705 Navigation Blvd.<o:p></o:p></span></a></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="mso-bookmark:_Hlk190178509"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Houston, Texas 77011</span></span><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none;layout-grid-mode:line"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none;layout-grid-mode:line">SBN:
+<a name="_Hlk192063298">24103040</a> (JAS)<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none;layout-grid-mode:line">TXSD: 3364212<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none;layout-grid-mode:line"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none;layout-grid-mode:line">SBN:
+<a name="_Hlk192063349">24122641</a> (GP)<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none;layout-grid-mode:line">TXSD: 3685189<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none;layout-grid-mode:line"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none;layout-grid-mode:line">SBN:
+<a name="_Hlk192063365">24044430</a> (GJF)<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none;layout-grid-mode:line">TXSD: 611329<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none;layout-grid-mode:line"><o:p>&nbsp;</o:p></span></p>
+</td>
+<td width="204" valign="top" style="width:153.0pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt">
+<p class="MsoNormal" style="text-align:justify;line-height:105%;text-autospace:ideograph-other">
+<span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">(713) 277-7838 &#8211; Telephone<o:p></o:p></span></p>
+<p class="MsoNormal" style="text-align:justify;line-height:105%;text-autospace:ideograph-other">
+<span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">(713) 583-0541 &#8211; Facsimile<o:p></o:p></span></p>
+<p class="MsoNormal" style="text-indent:-.7pt;line-height:105%;text-autospace:none">
+<a name="_Hlk190178514"></a><a href="mailto:jusolis@manuelsolis.com"><span style="mso-bookmark:_Hlk190178514"><span style="font-family:&quot;Times New Roman&quot;,serif;color:blue;mso-ligatures:none">jusolis@manuelsolis.com</span></span><span style="mso-bookmark:_Hlk190178514"></span></a><span style="mso-bookmark:_Hlk190178514"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></span></p>
+<p class="MsoNormal" style="text-indent:-.7pt;line-height:105%;text-autospace:none">
+<span style="mso-bookmark:_Hlk190178514"></span><a href="mailto:gperez@manuelsolis.com"><span style="mso-bookmark:_Hlk190178514"><span style="font-family:&quot;Times New Roman&quot;,serif;color:blue;mso-ligatures:none">gperez@manuelsolis.com</span></span><span style="mso-bookmark:_Hlk190178514"></span></a><span style="mso-bookmark:_Hlk190178514"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></span></p>
+<p class="MsoNormal" style="text-indent:-.7pt;line-height:105%;text-autospace:none">
+<span style="mso-bookmark:_Hlk190178514"></span><a href="mailto:gfinney@manuelsolis.com"><span style="mso-bookmark:_Hlk190178514"><span style="font-family:&quot;Times New Roman&quot;,serif;color:blue;mso-ligatures:none">gfinney@manuelsolis.com</span></span><span style="mso-bookmark:_Hlk190178514"></span></a><span style="mso-bookmark:_Hlk190178514"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">
+</span></span><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><b><u><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Paralegal:<o:p></o:p></span></u></b></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Eveliz Cruz Colon<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><a href="mailto:ecruz@manuelsolis.com"><span style="color:blue">ecruz@manuelsolis.com</span></a><o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Hilda Pavez<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><a href="mailto:hpavez@manuelsolis.com"><span style="color:blue">hpavez@manuelsolis.com</span></a><o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><b><u><span style="font-size:11.0pt;line-height:105%;font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p><span style="text-decoration:none">&nbsp;</span></o:p></span></u></b></p>
+</td>
+<td width="159" valign="top" style="width:119.05pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Tania V. Menendez<o:p></o:p></span></p>
+</td>
+</tr>
+<tr>
+<td width="276" valign="top" style="width:206.75pt;border:solid windowtext 1.0pt;border-top:none;background:#D9D9D9;padding:0in 5.4pt 0in 5.4pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><b><span style="font-family:&quot;Times New Roman&quot;,serif;color:black;mso-ligatures:none">Defendants</span></b><b><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p></o:p></span></b></p>
+</td>
+<td width="204" valign="top" style="width:153.0pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;background:#D9D9D9;padding:0in 5.4pt 0in 5.4pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;background:yellow;mso-highlight:yellow;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+</td>
+<td width="159" valign="top" style="width:119.05pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;background:#D9D9D9;padding:0in 5.4pt 0in 5.4pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;background:yellow;mso-highlight:yellow;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+</td>
+</tr>
+<tr style="height:93.1pt">
+<td width="276" valign="top" style="width:206.75pt;border:solid windowtext 1.0pt;border-top:none;padding:0in 5.4pt 0in 5.4pt;height:93.1pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Dale M. &#8220;Rett&#8221; Holidy<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Cameron Wilson<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;font-variant:small-caps;mso-ligatures:none">Germer PLLC<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">America Tower<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">2929 Allen Parkway, Suite 2900<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Houston, Texas 77019<o:p></o:p></span></p>
+</td>
+<td width="204" valign="top" style="width:153.0pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:93.1pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">(713) 650-1313 - Telephone<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">(713) 739-7420 - Facsimile<o:p></o:p></span></p>
+</td>
+<td width="159" valign="top" style="width:119.05pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:93.1pt">
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><a name="_Hlk51845987"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">State Farm
+</span></a><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none">Lloyds<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="line-height:105%;text-autospace:none"><span style="font-family:&quot;Times New Roman&quot;,serif;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal"><span style="font-family:&quot;Arial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<table class="MsoNormalTable" border="0" cellspacing="3" cellpadding="0">
+<tbody>
+<tr>
+<td width="117" valign="top" style="width:87.65pt;padding:.75pt .75pt .75pt .75pt">
+<p class="MsoNormal" style="line-height:105%"><span style="font-size:11.0pt;line-height:105%;color:#1F497D;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+<p class="MsoNormal" style="line-height:105%"><span style="color:#1F497D;mso-ligatures:none"><img border="0" width="108" height="23" style="width:1.125in;height:.2395in" id="_x0000_i1025" src="cid:image001.jpg@01DC554A.7DEFCA40" alt="germer 2"></span><span style="color:#1F497D;mso-ligatures:none"><o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%"><span style="font-size:11.0pt;line-height:105%;color:#1F497D;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+</td>
+<td width="299" style="width:224.15pt;border:none;border-left:solid #ECE9D8 1.0pt;padding:.75pt .75pt .75pt 4.5pt">
+<p class="MsoNormal" style="line-height:105%"><b><span style="font-family:&quot;Californian FB&quot;,serif;color:#1F497D;mso-ligatures:none">Jacol Standley<br>
+</span></b><b><span style="color:#1F497D;mso-ligatures:none">Germer PLLC</span></b><span style="color:#1F497D;mso-ligatures:none"><br>
+2929 Allen Pkwy, Suite 2900<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%"><span style="color:#1F497D;mso-ligatures:none">Houston, Texas 77019<br>
+713.650.1313 Main<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%"><span style="color:#1F497D;mso-ligatures:none">713.830.9868 Direct<o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%"><span style="color:#1F497D;mso-ligatures:none">713.739.7420 Fax<br>
+</span><b><span style="font-family:&quot;Californian FB&quot;,serif;color:#0070C0;mso-ligatures:none"><a href="mailto:jstandley@germer.com">jstandley@germer.com</a></span></b><span style="color:#1F497D;mso-ligatures:none"><o:p></o:p></span></p>
+<p class="MsoNormal" style="line-height:105%"><b><span style="font-size:10.0pt;line-height:105%;font-family:&quot;Calibri&quot;,sans-serif;color:#0070C0;mso-ligatures:none"><o:p>&nbsp;</o:p></span></b></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="MsoNormal"><b><span style="font-size:9.0pt;mso-ligatures:none">PRIVILEGED &amp; CONFIDENTIAL COMMUNICATION:
+</span></b><span style="font-size:9.0pt;mso-ligatures:none">This e-mail and any files transmitted with it is confidential and is intended solely for the use of the individual or entity to whom they are addressed.&nbsp; This communication may contain material protected
+ by the Attorney-Client privilege and/or constitute attorney work product.&nbsp; If you are not the intended recipient or the person responsible for delivering the e-mail to the intended recipient, be advised that you have received this e-mail in error and that
+ any use, dissemination, forwarding, printing, or copying of this e-mail is strictly prohibited.&nbsp; If you have received this e-mail in error, please immediately notify us by telephone at (409) 654-6700, (713) 650-1313, or (512) 472-0288 or return by e-mail to:
+</span><span style="font-size:11.0pt;mso-ligatures:none"><a href="blocked::mailto:postmaster@germer.com" title="mailto:postmaster@germer.com"><span style="font-size:9.0pt;color:#0563C1">postmaster@germer.com</span></a></span><span style="font-size:9.0pt;mso-ligatures:none">.&nbsp;
+ You will be reimbursed for reasonable costs incurred in notifying us.<o:p></o:p></span></p>
+<p class="MsoNormal"><o:p>&nbsp;</o:p></p>
+<table class="MsoNormalTable" border="0" cellspacing="0" cellpadding="0" align="left" width="100%" style="width:100.0%">
+<tbody>
+<tr>
+<td style="background:#FFB900;padding:5.0pt 2.0pt 5.0pt 2.0pt"></td>
+<td width="100%" style="width:100.0%;background:#FFF8E5;padding:5.0pt 4.0pt 5.0pt 12.0pt">
+<div>
+<p class="MsoNormal" style="mso-element:frame;mso-element-frame-hspace:2.25pt;mso-element-wrap:around;mso-element-anchor-vertical:paragraph;mso-element-anchor-horizontal:column;mso-height-rule:exactly">
+<b><span style="color:#222222;mso-ligatures:none">Caution:</span></b><span style="color:#222222;mso-ligatures:none"> This is an external email. Please use caution when clicking links or opening attachments. When in doubt, contact
+<a href="mailto:security@gulfstreamlegal.com">security@gulfstreamlegal.com</a> <o:p>
+</o:p></span></p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="MsoNormal"><span style="mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+</div>
+</body>
+</html>
+
+--_000_SN6PR17MB2239CEAB64EB0B303CA29363D5C9ASN6PR17MB2239namp_--
+
+--_004_SN6PR17MB2239CEAB64EB0B303CA29363D5C9ASN6PR17MB2239namp_
+Content-Type: image/jpeg; name="image001.jpg"
+Content-Description: image001.jpg
+Content-Disposition: inline; filename="image001.jpg"; size=2031;
+	creation-date="Fri, 14 Nov 2025 15:44:21 GMT";
+	modification-date="Tue, 18 Nov 2025 17:15:32 GMT"
+Content-ID: <image001.jpg@01DC554A.7DEFCA40>
+Content-Transfer-Encoding: base64
+
+/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIf
+IiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7
+Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAXAGwDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDrtZ8Q
+6nrviv8A4RLw3dLaGBPM1HUNoZoVzjYgPG4+vv7VpN4FsmhwdX1z7Rj/AI+f7Tl359cZ2/hjFcp4
+Czp/xW8XWV6NtzdSGeAtwXj3sePXhh+Veo0Ac/a2eq6L4Tv4r/V31C5ijmeK5ZArhdp2g46ketcv
+4F0fUfE3hCy1e98Wa8k9xv3rFcqFGHZRgFT2FbOj+I7jxP4J1i9uYI4XiNzAFjJwQqnB571z/wAN
+/Dc2pfD7Tp08RaxZBxJiK2mRUTEjDgFD9evegDV+J97f6B4AR9P1G6juIpoYvtO/9446Ekjue9J4
+z0u80Twvc63pfiLVLe5sUEoWe5MscnI+VlbPXPHvUHxmQp8PNhdmK3MI3N1PXk1k6jFNb+ObbSPH
+N9cajot4Q2nSORHD5g6LKqABjzjnjp6nAB2n9vTzfDhtfkXyLh9MNwQONr+XnjPv0qt8N/Es3iPw
+ugvi39pWLfZ7xX4bcOjH6j9c1J8RHWDwNeQINonaK3VUGPvyKuB+BNc/rrDwL8SLTXwfL0nXALa+
+7LHKPuufT1/76oA2PiZ4mufD3heVdOLf2jcqwiKdYkUZeT/gI7+pFHibWLuP4UTavaXMkVybGKVZ
+lPzAnbk5/E1l3tu3iXw34o8SyIWjubKW201c4xboCd//AANxu+gWqtzcfav2eBJ6aeidP7rhf6UA
+bGg+GLzUtB0/UJvFviAS3NvHK4W5TbllBOBs6VH8Rb6+tNR8MWlpf3NrHe6gIZzBIUZ0O3jI+tS+
+F/DE83hzRrkeJdajH2aGTyVmTZjaDtxszt7delUfinG0ur+EI0meFm1QASIAWQ/LyMgjP1oAb4+G
+o+C9Nt/EGk67qDtFcJHJZ3c5mjnVu2DyD9K9DjcyRI5UqWUEqeo9q8u0ZGb4hNo3jueW/v4W87SJ
+pWC28q+qxgBd/Hv0I7DPqlAHF+LdDfWNShvbSwvrXU7H/j21G2khzj0ZWYbl68H1PqabHqHj8QeV
+JY2RfGPPEa7vrt83GfxxRRU69zRNdvzI9C0u90LwzdaMumX1w12ZXknZ4F+aQYOFD9KydE0fxz4e
+0aDSdOugltBu2b7OFmGWLHnzueSaKKNe47x7fn/mafifTNX8VeFYtGvbG6ScMjyXKeRh2XqQvmcZ
+PvVzxPZt4q0GXSr3w9dgMMxSiaDdE46MPn//AFjIooo17hePb8/8zGtbTxPqfh200bX7CZ7jTL6K
+X7RBNE32qOM5GcuMHIAJ+hrd8S27+KdDn0m+8P3oilwQ6TQbkYHII+f/ADmiih3Ji1bYsyz3DaK+
+lReHLmK3NubdVE0OFXbtHG/0rnIfDmoQfDmXweLC8YOrKtyzQ8Avv+75n4daKKNe5V49vz/zEsrX
+4gafp9tY212iw20axJmyhJ2qMDP770FX/Een3/iG90a6fS7yE6VdC4wHgPmkY4/1nHSiijXuF49v
+z/zG+M9JuvF2mxxJot3aahbOJLO7E0OYn98PnBx29j2ro/DF9qN5oFs+sWpttQRQlwu5WDMAPmBU
+kYPXHbNFFNESt0R//9k=
+
+--_004_SN6PR17MB2239CEAB64EB0B303CA29363D5C9ASN6PR17MB2239namp_--

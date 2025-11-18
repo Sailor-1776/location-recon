@@ -1,0 +1,894 @@
+Received: from SA3PR17MB6874.namprd17.prod.outlook.com (2603:10b6:806:301::21)
+ by MN2PR17MB3120.namprd17.prod.outlook.com with HTTPS; Mon, 17 Nov 2025
+ 19:22:20 +0000
+Received: from SN6PR17MB2239.namprd17.prod.outlook.com (2603:10b6:805:4e::23)
+ by SA3PR17MB6874.namprd17.prod.outlook.com (2603:10b6:806:301::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.8; Mon, 17 Nov
+ 2025 19:22:18 +0000
+Received: from SN6PR17MB2239.namprd17.prod.outlook.com
+ ([fe80::cb50:94e0:94a1:d02c]) by SN6PR17MB2239.namprd17.prod.outlook.com
+ ([fe80::cb50:94e0:94a1:d02c%3]) with mapi id 15.20.9343.009; Mon, 17 Nov 2025
+ 19:22:17 +0000
+From: "Blanton, Sharon" <sblanton@gulfstreamlegal.com>
+To: "Miller, Mike" <mmiller@gulfstreamlegal.com>
+Subject: FW: To Research: 19962 -- ADD ON: Matthew Dehoyas
+Thread-Topic: To Research: 19962 -- ADD ON: Matthew Dehoyas
+Thread-Index: AdxVmNuVX7PrqN8gRy2LNNzb9A9brQCXp6kw
+X-MS-Exchange-MessageSentRepresentingType: 1
+Date: Mon, 17 Nov 2025 19:22:17 +0000
+Message-ID:
+	<SN6PR17MB223923ABCECAD2DA4A150B6DD5C9A@SN6PR17MB2239.namprd17.prod.outlook.com>
+References:
+	<MN2PR17MB312012E6BB67BAAEF9F21BE1ACCAA@MN2PR17MB3120.namprd17.prod.outlook.com>
+In-Reply-To:
+	<MN2PR17MB312012E6BB67BAAEF9F21BE1ACCAA@MN2PR17MB3120.namprd17.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 04
+X-MS-Exchange-Organization-AuthSource: SN6PR17MB2239.namprd17.prod.outlook.com
+X-MS-Has-Attach: yes
+X-MS-Exchange-Organization-Network-Message-Id:
+	b17f9f7e-eff6-4c25-bf26-08de260e9ef2
+X-MS-Exchange-Organization-SCL: 1
+X-MS-TNEF-Correlator:
+X-MS-Exchange-Organization-RecordReviewCfmType: 0
+x-ms-publictraffictype: Email
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=gulfstreamlegal.com;
+x-ms-office365-filtering-correlation-id: b17f9f7e-eff6-4c25-bf26-08de260e9ef2
+x-ms-traffictypediagnostic:
+	SN6PR17MB2239:EE_|SA3PR17MB6874:EE_|MN2PR17MB3120:EE_
+x-microsoft-antispam:
+	BCL:0;ARA:13230040|69100299015|366016|4013099003|8096899003|13003099007|7053199007|41050700001;
+x-forefront-antispam-report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR17MB2239.namprd17.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(69100299015)(366016)(4013099003)(8096899003)(13003099007)(7053199007)(41050700001);DIR:INT;
+x-ms-exchange-crosstenant-originalarrivaltime: 17 Nov 2025 19:22:17.1225 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: e64b8cad-d81e-461f-9e6f-2539d215e7ba
+x-ms-exchange-crosstenant-authsource: SN6PR17MB2239.namprd17.prod.outlook.com
+x-ms-exchange-crosstenant-authas: Internal
+x-ms-exchange-crosstenant-network-message-id:
+	b17f9f7e-eff6-4c25-bf26-08de260e9ef2
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname:
+	/TTnbs28FvXcfzpaItv6GUulz2UCiSQVfT/o+RFgUhqGsRGQSG8vdU5QxPFAWp0qBBnnIZy/hqdGX36Cp8EaTflZ5FCVI6+9sHuVjBT0UHo=
+x-ms-exchange-transport-crosstenantheadersstamped: SA3PR17MB6874
+x-ms-exchange-transport-endtoendlatency: 00:00:02.9144852
+x-ms-exchange-processed-by-bccfoldering: 15.20.9343.009
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;auth:0;dest:I;ENG:(910005)(944506478)(944626604)(920097)(425001)(930097)(140003)(1420198);
+X-Microsoft-Antispam-Message-Info:
+	SP0gzqXSnUO8OTcTgV7jMNny1AtEONkTQbdS9elfkh5yqCAH4XoUUx/2Jfc89NOwYo6NmA/AIAWnwTCmXc7aSUyXxwk2v6KrvS0ZiEahc0QSBdxJpEh4OsWW2DO6JpIZQeZt5p9fMuw9YJzzObUhnFnKqZ70FeqaOrIc09Bk5oWmwUNhuQ7WkrgULfnIVkEBoQBpTHBgFp41+p2j5auYDNQalgS2gCHu2GedvdyqSlxYWvrmR1J2e7JRAO1/DPmglSg4/AmcsuHUZtM94kqVNMiPN+GjxYXDdESSgSZS+rlW8nCqd+0Px+OD3PSkH3xLls5OEPGLKNbJQEonPWmQp+s+RIwlVbTkphXVOt6og0RrTebSommCj/Z5h1DQMWJoLfrTHkWbzM9M56p8j8Yd2GZDZ+OhR2eYeQAkTplNU6QVKdSoUN/dUhDDn7Bz5ohbEQbAiwJdlXZyVJf12go/vbKwg46q0Pw0Ib9/ohGtsBm+EIsdAfvUj6VKc+IMInhIsSV41XpyPkrmfrulDSWq9nH4NCoJvqDsY4NcxjLo3k2XFLcl0d14n5TmXvbVuNVxLj5qfBP+Q22xItkxYiH1DzxZVxalc5Xmfs9PDfYE8SjuLu07atoKecClWtjOar2a923iUOkLVobL5/iIq1g77nXleeSKh9+7V3Uw/hhNBKaRpRTU5V7yrKrq9MqZLKavY4M/nR1k9FcN98g90VIsO6d/K7vRJ5YyMrlZl0hBrgr5G/t1SfC5TLKi7VHeZCXmeigASSjkZZAh36iiEBLv1avr8n6L2N5jAFug92sxOd+bsLN8FQ4fgFuAbyGvmYTXCosdAc836WtwppF63xHf1Q==
+Content-Type: multipart/related;
+	boundary="_004_SN6PR17MB223923ABCECAD2DA4A150B6DD5C9ASN6PR17MB2239namp_";
+	type="multipart/alternative"
+MIME-Version: 1.0
+
+--_004_SN6PR17MB223923ABCECAD2DA4A150B6DD5C9ASN6PR17MB2239namp_
+Content-Type: multipart/alternative;
+	boundary="_000_SN6PR17MB223923ABCECAD2DA4A150B6DD5C9ASN6PR17MB2239namp_"
+
+--_000_SN6PR17MB223923ABCECAD2DA4A150B6DD5C9ASN6PR17MB2239namp_
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+
+
+
+From: Miller, Mike <mmiller@gulfstreamlegal.com>
+Sent: Friday, November 14, 2025 1:00 PM
+To: Blanton, Sharon <sblanton@gulfstreamlegal.com>
+Subject: To Research: 19962 -- ADD ON: Matthew Dehoyas
+
+Locations below
+
+
+From: Royston, Nichole <nroyston@gulfstreamlegal.com<mailto:nroyston@gulfst=
+reamlegal.com>>
+Sent: Friday, November 14, 2025 12:27 PM
+To: Miller, Mike <mmiller@gulfstreamlegal.com<mailto:mmiller@gulfstreamlega=
+l.com>>; Reed, Mark <mreed@gulfstreamlegal.com<mailto:mreed@gulfstreamlegal=
+.com>>
+Subject: 19962 -- ADD ON: Matthew Dehoyas
+
+Medical/radiology/pharmacy: 1/06/2020-present
+
+From: Deanna Briceno <dbriceno@bushramirez.com<mailto:dbriceno@bushramirez.=
+com>>
+Sent: Friday, November 14, 2025 9:42 AM
+To: Royston, Nichole <nroyston@gulfstreamlegal.com<mailto:nroyston@gulfstre=
+amlegal.com>>; Reed, Mark <mreed@gulfstreamlegal.com<mailto:mreed@gulfstrea=
+mlegal.com>>
+Subject: RE: Cause No. 2025-56638; Matthew Dehoyos v. Marvin Ray Riggins
+
+Claim No.:      040601-000008-AB-01
+Insured:           ISC Constructors, LLC and driver, Marvin Riggins
+Plaintiff:          Matthew Dehoyos
+DOL:               01/06/2025
+Our File #       01272.19331
+
+Cause No. 2025-56638; Matthew Dehoyos v. Marvin Ray Riggins and ISC Constru=
+ctors; In the 333rd Judicial District Court Harris County, Texas
+
+Good morning Mark and Nichole,
+
+We now represent both Defendants in this matter. At your earliest convenien=
+ce can you please request the following records on behalf of Brandon K. Bes=
+t? Please let me know if you have any questions. Also, we now have the SSN =
+which is included below.
+
+Plaintiff:
+Matthew Dehoyos
+DOB: 03/04/1987
+SSN: xxx-xx-1990
+
+Please order medical and radiology records dating back to January 6, 2020, =
+from the following providers/facilities:
+Minivasive Pain Specialist    MINIPAINSPEC-M   no radiology
+3301 Spring Stuebner Rd., Suite 110
+Spring, Texas 77389
+(346) 318-1500
+
+Townsen Memorial Imaging    TMICSPRING-M   TMICSPRING-R
+3301 Spring Stuebner Rd., Suite 120
+Spring, Texas 77389
+(281) 407-5760
+
+Townsen Memorial Surgery Center    TMSCSPRING-M   TMSCSPRING-R
+3301 Spring Stuebner Rd
+Spring, Texas 77389
+(346) 386-6700
+
+Houston Spine and Rehab =96 The Woodlands    HSRC-MR
+3101 College Park Dr.
+The Woodlands, Texas 77384
+(346) 521-2288
+
+Please request ANY AND ALL PHARMACY RECORDS FROM January 6, 2020, TO THE PR=
+ESENT, including but not limited to any type of prescription records (e.g.,=
+ prescription history and benefits); medical records; doctor=92s orders/not=
+es; patient information sheets; patient evaluation forms; any type of corre=
+spondence; and printouts of any type of data maintained in electronic forma=
+t, including email transmissions from the following facility:
+DeliverIt Pharmacy    DELIVERITPHARMCY
+13303 W. Airport Blvd, Ste A
+Sugar Land, Texas 77478
+(281) 277-1071
+
+
+PLAINTIFF=92S COUNSEL:
+Misha J. Paltiyevich
+Zehl & Associates, P.C.
+2700 Post Oak Blvd, Ste 1000
+Houston, TX  77056
+Phone: 713-491-6064
+Fax: 713-583-8545
+Email: eservice@zehllaw.com<mailto:eservice@zehllaw.com>
+
+
+
+Deanna Briceno | Legal Assistant
+5615 Kirby Drive, Suite 900
+Houston, Texas 77005
+M: (713) 626-1555 | D: (713) 800-3508
+Email<mailto:dbriceno@bushramirez.com> | Website<https://nam12.safelinks.pr=
+otection.outlook.com/?url=3Dhttps%3A%2F%2Fbushramirez.com%2F&data=3D05%7C02=
+%7Cmmiller%40gulfstreamlegal.com%7Cb17f9f7eeff64c25bf2608de260e9ef2%7Ce64b8=
+cadd81e461f9e6f2539d215e7ba%7C0%7C0%7C638990041404447160%7CUnknown%7CTWFpbG=
+Zsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiT=
+WFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3Do8eL2Z%2FlilDaDTBglK6tbATrAJln=
+RRUc1A1JPjWMWxQ%3D&reserved=3D0>
+[Bush + Ramirez]<https://nam12.safelinks.protection.outlook.com/?url=3Dhttp=
+s%3A%2F%2Fbushramirez.com%2F&data=3D05%7C02%7Cmmiller%40gulfstreamlegal.com=
+%7Cb17f9f7eeff64c25bf2608de260e9ef2%7Ce64b8cadd81e461f9e6f2539d215e7ba%7C0%=
+7C0%7C638990041404469310%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIl=
+YiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7=
+C%7C&sdata=3DvvIcZsBM9dWToNSG%2B3996R3Zcw%2B%2Bq8cxGz1ubOObblg%3D&reserved=
+=3D0>
+
+Houston =95 San Antonio =95 Central Texas
+
+This email is confidential, intended only for the named recipient(s) above,=
+ and may contain information that is privileged, attorney work product, att=
+orney-client material, or exempt from disclosure under applicable law. If y=
+ou receive this message in error, or are not the named recipient(s), please=
+ notify the sender at the phone number above, do not copy this message, do =
+not disclose its contents to anyone, and delete this email message from you=
+r computer. Thank you, Bush & Ramirez, PLLC
+[ signature:1324f6555073e4e2f01a098b5b271dad ]
+From: Deanna Briceno
+Sent: Friday, September 5, 2025 3:22 PM
+To: Royston, Nichole <nroyston@gulfstreamlegal.com<mailto:nroyston@gulfstre=
+amlegal.com>>; Reed, Mark <mreed@gulfstreamlegal.com<mailto:mreed@gulfstrea=
+mlegal.com>>
+Subject: Cause No. 2025-56638; Matthew Dehoyos v. Marvin Ray Riggins
+
+Claim No.:      040601-000008-AB-01
+Insured:           ISC Constructors, LLC and driver, Marvin Riggins
+Plaintiff:           Matthew Dehoyos
+DOL:               01/06/2025
+Our File #       01272.19331
+
+Cause No. 2025-56638; Matthew Dehoyos v. Marvin Ray Riggins; In the 333rd J=
+udicial District Court Harris County, Texas
+
+Good afternoon Mark and Nichole,
+
+We represent the Defendant Marvin Riggins in the referenced matter. At your=
+ earliest convenience, please order the following records on behalf of Bran=
+don K. Best. I=92ve included the crash report for reference. Please let me =
+know if you have any questions.
+
+Plaintiff:
+Matthew Dehoyos
+DOB: 03/04/1987
+
+Defendant Driver:
+Marvin Ray Riggins
+DOB: 03/28/1969
+
+Please order the entire police investigation file for January 6, 2025, incl=
+uding but not limited to body camera footage, dash camera footage, and phot=
+ographs from the following facilities:
+
+Houston Police Department
+Investigator: K. Galvez
+1200 Travis Street
+Houston, Texas 77002
+Case ID: 0002676225H
+
+PLAINTIFF=92S COUNSEL:
+Misha J. Paltiyevich
+Zehl & Associates, P.C.
+2700 Post Oak Blvd, Ste 1000
+Houston, TX  77056
+Phone: 713-491-6064
+Fax: 713-583-8545
+Email: eservice@zehllaw.com<mailto:eservice@zehllaw.com>
+
+
+Deanna Briceno
+Legal Assistant to Brandon K. Best
+
+Bush + Ramirez
+5615 Kirby Drive
+Suite 900
+Houston, Texas 77005
+
+713-626-1555 Main
+713-800-3508 Direct
+713-622-8077 Fax
+
+dbriceno@bushramirez.com<mailto:dbriceno@bushramirez.com>
+www.bushramirez.com<https://nam12.safelinks.protection.outlook.com/?url=3Dh=
+ttp%3A%2F%2Fwww.bushramirez.com%2F&data=3D05%7C02%7Cmmiller%40gulfstreamleg=
+al.com%7Cb17f9f7eeff64c25bf2608de260e9ef2%7Ce64b8cadd81e461f9e6f2539d215e7b=
+a%7C0%7C0%7C638990041404487224%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRy=
+dWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C=
+0%7C%7C%7C&sdata=3DQ85RMgoqUsu8j6QXXlwgNyX3AKuNf3O2uKYmQVUZ%2FBI%3D&reserve=
+d=3D0>
+
+[http://bushramirez.com/wp-content/uploads/b_r_logotype.jpg]
+
+This email is confidential, intended only for the named recipient(s) above,=
+ and may contain information that is privileged, attorney work product, att=
+orney-client material, or exempt from disclosure under applicable law. If y=
+ou receive this message in error, or are not the named recipient(s), please=
+ notify the sender at the phone number above, do not copy this message, do =
+not disclose its contents to anyone, and delete this email message from you=
+r computer. Thank you, Bush & Ramirez, PLLC.
+
+
+--_000_SN6PR17MB223923ABCECAD2DA4A150B6DD5C9ASN6PR17MB2239namp_
+Content-Type: text/html; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DWindows-1=
+252">
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<!--[if !mso]><style>v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style><![endif]--><style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:Aptos;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	font-size:12.0pt;
+	font-family:"Aptos",sans-serif;
+	mso-ligatures:standardcontextual;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#467886;
+	text-decoration:underline;}
+span.EmailStyle22
+	{mso-style-type:personal-reply;
+	font-family:"Aptos",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-size:10.0pt;
+	mso-ligatures:none;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+--></style>
+</head>
+<body lang=3D"EN-US" link=3D"#467886" vlink=3D"#96607D" style=3D"word-wrap:=
+break-word">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal"><span style=3D"font-size:11.0pt"><o:p>&nbsp;</o:p></=
+span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:11.0pt"><o:p>&nbsp;</o:p></=
+span></p>
+<div>
+<div style=3D"border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in =
+0in 0in">
+<p class=3D"MsoNormal"><b><span style=3D"font-size:11.0pt;font-family:&quot=
+;Calibri&quot;,sans-serif;mso-ligatures:none">From:</span></b><span style=
+=3D"font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif;mso-ligatur=
+es:none"> Miller, Mike &lt;mmiller@gulfstreamlegal.com&gt;
+<br>
+<b>Sent:</b> Friday, November 14, 2025 1:00 PM<br>
+<b>To:</b> Blanton, Sharon &lt;sblanton@gulfstreamlegal.com&gt;<br>
+<b>Subject:</b> To Research: 19962 -- ADD ON: Matthew Dehoyas<o:p></o:p></s=
+pan></p>
+</div>
+</div>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:11.0pt;font-family:&quot;Ca=
+libri&quot;,sans-serif">Locations below<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:11.0pt;font-family:&quot;Ca=
+libri&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:11.0pt;font-family:&quot;Ca=
+libri&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<div>
+<div style=3D"border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in =
+0in 0in">
+<p class=3D"MsoNormal"><b><span style=3D"font-size:11.0pt;font-family:&quot=
+;Calibri&quot;,sans-serif;mso-ligatures:none">From:</span></b><span style=
+=3D"font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif;mso-ligatur=
+es:none"> Royston, Nichole &lt;<a href=3D"mailto:nroyston@gulfstreamlegal.c=
+om">nroyston@gulfstreamlegal.com</a>&gt;
+<br>
+<b>Sent:</b> Friday, November 14, 2025 12:27 PM<br>
+<b>To:</b> Miller, Mike &lt;<a href=3D"mailto:mmiller@gulfstreamlegal.com">=
+mmiller@gulfstreamlegal.com</a>&gt;; Reed, Mark &lt;<a href=3D"mailto:mreed=
+@gulfstreamlegal.com">mreed@gulfstreamlegal.com</a>&gt;<br>
+<b>Subject:</b> 19962 -- ADD ON: Matthew Dehoyas<o:p></o:p></span></p>
+</div>
+</div>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Calibri&quot;,sans-=
+serif;color:#0F4761">Medical/radiology/pharmacy: 1/06/2020-present<o:p></o:=
+p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Calibri&quot;,sans-=
+serif;color:#0F4761"><o:p>&nbsp;</o:p></span></p>
+<div>
+<div style=3D"border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in =
+0in 0in">
+<p class=3D"MsoNormal"><b><span style=3D"font-size:11.0pt;font-family:&quot=
+;Calibri&quot;,sans-serif;mso-ligatures:none">From:</span></b><span style=
+=3D"font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif;mso-ligatur=
+es:none"> Deanna Briceno &lt;<a href=3D"mailto:dbriceno@bushramirez.com">db=
+riceno@bushramirez.com</a>&gt;
+<br>
+<b>Sent:</b> Friday, November 14, 2025 9:42 AM<br>
+<b>To:</b> Royston, Nichole &lt;<a href=3D"mailto:nroyston@gulfstreamlegal.=
+com">nroyston@gulfstreamlegal.com</a>&gt;; Reed, Mark &lt;<a href=3D"mailto=
+:mreed@gulfstreamlegal.com">mreed@gulfstreamlegal.com</a>&gt;<br>
+<b>Subject:</b> RE: Cause No. 2025-56638; Matthew Dehoyos v. Marvin Ray Rig=
+gins<o:p></o:p></span></p>
+</div>
+</div>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Claim No.:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 040601-000008-AB-01<o:p>=
+</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Insured:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp; ISC Constructors, LLC and driver, Marvin Riggins<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Plaintiff:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;Matthew Dehoyos<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">DOL:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp; 01/06/2025<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Times New Roman&=
+quot;,serif">Our File #&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 01272.19331</sp=
+an></b><span style=3D"font-family:&quot;Times New Roman&quot;,serif"><o:p><=
+/o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Cause No. 2025-56638;
+<b><i>Matthew Dehoyos v. Marvin Ray Riggins and ISC Constructors;</i></b> I=
+n the 333<sup>rd</sup> Judicial District Court Harris County, Texas<o:p></o=
+:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Good morning Mark and Nichole,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">We now represent both Defendants in this matter. At your earliest=
+ convenience can you please request the following records on behalf of Bran=
+don K. Best? Please let me know if you have any
+ questions. Also, we now have the SSN which is included below.<o:p></o:p></=
+span></p>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Times New Roman&=
+quot;,serif"><o:p>&nbsp;</o:p></span></b></p>
+<p class=3D"MsoNormal"><b><u><span style=3D"font-family:&quot;Times New Rom=
+an&quot;,serif">Plaintiff:<o:p></o:p></span></u></b></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Matthew Dehoyos<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">DOB: 03/04/1987<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">SSN: xxx-xx-1990<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Times New Roman&=
+quot;,serif"><o:p>&nbsp;</o:p></span></b></p>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Times New Roman&=
+quot;,serif">Please order
+<span style=3D"background:yellow;mso-highlight:yellow">medical and radiolog=
+y</span> records dating back to January 6, 2020, from the following provide=
+rs/facilities:<o:p></o:p></span></b></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Minivasive Pain Specialist&nbsp;&nbsp;&nbsp;
+</span><b><span style=3D"font-family:&quot;Calibri&quot;,sans-serif;color:#=
+EE0000">MINIPAINSPEC-M&nbsp;&nbsp; no radiology</span></b><span style=3D"fo=
+nt-family:&quot;Times New Roman&quot;,serif"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">3301 Spring Stuebner Rd., Suite 110<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Spring, Texas 77389<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">(346) 318-1500<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Townsen Memorial Imaging&nbsp;&nbsp;&nbsp;
+</span><b><span style=3D"font-family:&quot;Calibri&quot;,sans-serif;color:#=
+EE0000">TMICSPRING-M&nbsp;&nbsp; TMICSPRING-R</span></b><span style=3D"font=
+-family:&quot;Times New Roman&quot;,serif"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">3301 Spring Stuebner Rd., Suite 120<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Spring, Texas 77389<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">(281) 407-5760<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Townsen Memorial Surgery Center&nbsp;&nbsp;&nbsp;
+</span><b><span style=3D"font-family:&quot;Calibri&quot;,sans-serif;color:#=
+EE0000">TMSCSPRING-M&nbsp;&nbsp; TMSCSPRING-R</span></b><span style=3D"font=
+-family:&quot;Times New Roman&quot;,serif"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">3301 Spring Stuebner Rd<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Spring, Texas 77389<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">(346) 386-6700<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Houston Spine and Rehab =96 The Woodlands&nbsp;&nbsp;&nbsp;
+</span><b><span style=3D"font-family:&quot;Calibri&quot;,sans-serif;color:#=
+EE0000">HSRC-MR</span></b><span style=3D"font-family:&quot;Times New Roman&=
+quot;,serif"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">3101 College Park Dr.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">The Woodlands, Texas 77384<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">(346) 521-2288<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Times New Roman&=
+quot;,serif"><o:p>&nbsp;</o:p></span></b></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify;line-height:15.0pt;text-=
+autospace:none">
+<b><span style=3D"font-family:&quot;Times New Roman&quot;,serif">Please req=
+uest ANY AND ALL <span style=3D"background:yellow;mso-highlight:yellow">
+PHARMACY RECORDS</span> FROM January 6, 2020, TO THE PRESENT, including but=
+ not limited to any type of prescription records (e.g., prescription histor=
+y and benefits); medical records; doctor=92s orders/notes; patient informat=
+ion sheets; patient evaluation forms;
+ any type of correspondence; and printouts of any type of data maintained i=
+n electronic format, including email transmissions from the following facil=
+ity:<o:p></o:p></span></b></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify;line-height:15.0pt;text-=
+autospace:none">
+<span style=3D"font-family:&quot;Times New Roman&quot;,serif">DeliverIt Pha=
+rmacy&nbsp;&nbsp;&nbsp; </span><b><span style=3D"font-family:&quot;Calibri&=
+quot;,sans-serif;color:#EE0000">DELIVERITPHARMCY</span></b><span style=3D"f=
+ont-family:&quot;Times New Roman&quot;,serif"><o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify;line-height:15.0pt;text-=
+autospace:none">
+<span style=3D"font-family:&quot;Times New Roman&quot;,serif">13303 W. Airp=
+ort Blvd, Ste A<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify;line-height:15.0pt;text-=
+autospace:none">
+<span style=3D"font-family:&quot;Times New Roman&quot;,serif">Sugar Land, T=
+exas 77478<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"text-align:justify;line-height:15.0pt;text-=
+autospace:none">
+<span style=3D"font-family:&quot;Times New Roman&quot;,serif">(281) 277-107=
+1<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:11.0pt;font-family:&quot;Ca=
+libri&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><b><u><span style=3D"font-family:&quot;Times New Rom=
+an&quot;,serif">PLAINTIFF=92S COUNSEL:<o:p></o:p></span></u></b></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Misha J. Paltiyevich<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Zehl &amp; Associates, P.C.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">2700 Post Oak Blvd, Ste 1000<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Houston, TX&nbsp; 77056<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Phone: 713-491-6064<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Fax: 713-583-8545<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Email: <a href=3D"mailto:eservice@zehllaw.com">
+eservice@zehllaw.com</a><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<div>
+<table class=3D"MsoNormalTable" border=3D"0" cellspacing=3D"0" cellpadding=
+=3D"0" width=3D"100%" style=3D"width:100.0%">
+<tbody>
+<tr>
+<td width=3D"100%" style=3D"width:100.0%;padding:0in 0in 0in 0in">
+<table class=3D"MsoNormalTable" border=3D"0" cellspacing=3D"0" cellpadding=
+=3D"0" width=3D"100%" style=3D"width:100.0%">
+<tbody>
+<tr>
+<td width=3D"100%" style=3D"width:100.0%;padding:0in 0in 0in 0in">
+<table class=3D"MsoNormalTable" border=3D"0" cellspacing=3D"0" cellpadding=
+=3D"0">
+<tbody>
+<tr>
+<td nowrap=3D"" style=3D"padding:0in 0in 0in 0in">
+<p style=3D"margin:0in;line-height:13.5pt"><b><span style=3D"font-family:&q=
+uot;Arial&quot;,sans-serif;color:#17B4F1">Deanna&nbsp;Briceno</span></b><sp=
+an style=3D"font-size:10.0pt;font-family:&quot;Arial&quot;,sans-serif">&nbs=
+p;|&nbsp;Legal&nbsp;Assistant<br>
+5615&nbsp;Kirby&nbsp;Drive,&nbsp;Suite&nbsp;900<br>
+Houston,&nbsp;Texas&nbsp;77005<br>
+M:&nbsp;(713) 626-1555&nbsp;|&nbsp;D:&nbsp;(713) 800-3508<br>
+<a href=3D"mailto:dbriceno@bushramirez.com"><span style=3D"color:#17B4F1">E=
+mail</span></a>&nbsp;<span style=3D"color:#17B4F1">|</span>&nbsp;<a href=3D=
+"https://nam12.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fbushra=
+mirez.com%2F&amp;data=3D05%7C02%7Cmmiller%40gulfstreamlegal.com%7Cb17f9f7ee=
+ff64c25bf2608de260e9ef2%7Ce64b8cadd81e461f9e6f2539d215e7ba%7C0%7C0%7C638990=
+041404447160%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMD=
+AwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&amp;sda=
+ta=3Do8eL2Z%2FlilDaDTBglK6tbATrAJlnRRUc1A1JPjWMWxQ%3D&amp;reserved=3D0" ori=
+ginalsrc=3D"https://bushramirez.com/"><span style=3D"color:#17B4F1">Website=
+</span></a>
+<o:p></o:p></span></p>
+</td>
+</tr>
+<tr>
+<td nowrap=3D"" style=3D"padding:5.25pt 0in 12.0pt 0in;border-style:hidden"=
+>
+<p class=3D"MsoNormal"><a href=3D"https://nam12.safelinks.protection.outloo=
+k.com/?url=3Dhttps%3A%2F%2Fbushramirez.com%2F&amp;data=3D05%7C02%7Cmmiller%=
+40gulfstreamlegal.com%7Cb17f9f7eeff64c25bf2608de260e9ef2%7Ce64b8cadd81e461f=
+9e6f2539d215e7ba%7C0%7C0%7C638990041404469310%7CUnknown%7CTWFpbGZsb3d8eyJFb=
+XB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldU=
+IjoyfQ%3D%3D%7C0%7C%7C%7C&amp;sdata=3DvvIcZsBM9dWToNSG%2B3996R3Zcw%2B%2Bq8c=
+xGz1ubOObblg%3D&amp;reserved=3D0" originalsrc=3D"https://bushramirez.com/">=
+<span style=3D"font-size:1.0pt;color:blue;mso-ligatures:none;text-decoratio=
+n:none"><img border=3D"0" width=3D"166" height=3D"14" style=3D"width:1.7291=
+in;height:.1458in" id=3D"_x0000_i1026" src=3D"https://stationerycentral.com=
+/2025/bush-ramirez-logo-332x28.png" alt=3D"Bush + Ramirez"></span></a><span=
+ style=3D"font-size:1.0pt"><o:p></o:p></span></p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr>
+<td style=3D"padding:0in 0in 6.75pt 0in;border-style:hidden">
+<p style=3D"margin:0in;line-height:12.0pt"><b><span style=3D"font-size:10.0=
+pt;font-family:&quot;Arial&quot;,sans-serif">Houston&nbsp;=95&nbsp;San&nbsp=
+;Antonio&nbsp;=95&nbsp;Central&nbsp;Texas</span></b><span style=3D"font-siz=
+e:10.0pt;font-family:&quot;Arial&quot;,sans-serif"><o:p></o:p></span></p>
+</td>
+</tr>
+<tr>
+<td style=3D"padding:0in 0in 6.75pt 0in;border-style:hidden">
+<p style=3D"margin:0in;line-height:12.0pt"><span style=3D"font-size:10.0pt;=
+font-family:&quot;Arial&quot;,sans-serif"><br>
+This email is confidential, intended only for the named recipient(s) above,=
+ and may contain information that is privileged,&nbsp;attorney&nbsp;work pr=
+oduct,&nbsp;attorney-client material, or exempt from disclosure under appli=
+cable law. If you receive this message in error,
+ or are not the named recipient(s), please notify the sender at the phone n=
+umber above, do not copy this message, do not disclose its contents to anyo=
+ne, and delete this email message from your computer. Thank you, Bush &amp;=
+ Ramirez, PLLC<o:p></o:p></span></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class=3D"MsoNormal"><span style=3D"font-size:1.0pt">[ signature:1324f655=
+5073e4e2f01a098b5b271dad ]</span>
+<span style=3D"font-family:&quot;Times New Roman&quot;,serif"><o:p></o:p></=
+span></p>
+<div>
+<div style=3D"border:none;border-top:solid #E1E1E1 1.0pt;padding:3.0pt 0in =
+0in 0in">
+<p class=3D"MsoNormal"><b><span style=3D"font-size:11.0pt;font-family:&quot=
+;Calibri&quot;,sans-serif;mso-ligatures:none">From:</span></b><span style=
+=3D"font-size:11.0pt;font-family:&quot;Calibri&quot;,sans-serif;mso-ligatur=
+es:none"> Deanna Briceno
+<br>
+<b>Sent:</b> Friday, September 5, 2025 3:22 PM<br>
+<b>To:</b> Royston, Nichole &lt;<a href=3D"mailto:nroyston@gulfstreamlegal.=
+com">nroyston@gulfstreamlegal.com</a>&gt;; Reed, Mark &lt;<a href=3D"mailto=
+:mreed@gulfstreamlegal.com">mreed@gulfstreamlegal.com</a>&gt;<br>
+<b>Subject:</b> Cause No. 2025-56638; Matthew Dehoyos v. Marvin Ray Riggins=
+<o:p></o:p></span></p>
+</div>
+</div>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Claim No.:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 040601-000008-AB-01<o:p>=
+</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Insured:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp; ISC Constructors, LLC and driver, Marvin Riggins<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Plaintiff:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; Matthew Dehoyos<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">DOL:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp; 01/06/2025<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Times New Roman&=
+quot;,serif">Our File #&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 01272.19331</sp=
+an></b><span style=3D"font-family:&quot;Times New Roman&quot;,serif"><o:p><=
+/o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Cause No. 2025-56638;
+<b><i>Matthew Dehoyos v. Marvin Ray Riggins;</i></b> In the 333<sup>rd</sup=
+> Judicial District Court Harris County, Texas<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Good afternoon Mark and Nichole,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">We represent the Defendant Marvin Riggins in the referenced matte=
+r. At your earliest convenience, please order the following records on beha=
+lf of Brandon K. Best. I=92ve included the crash
+ report for reference. Please let me know if you have any questions.<o:p></=
+o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><b><u><span style=3D"font-family:&quot;Times New Rom=
+an&quot;,serif">Plaintiff:<o:p></o:p></span></u></b></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Matthew Dehoyos<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">DOB: 03/04/1987<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><b><u><span style=3D"font-family:&quot;Times New Rom=
+an&quot;,serif">Defendant Driver:</span></u></b><span style=3D"font-family:=
+&quot;Times New Roman&quot;,serif"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Marvin Ray Riggins<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">DOB: 03/28/1969<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Times New Roman&=
+quot;,serif">Please order the entire police investigation file for January =
+6, 2025, including but not limited to body camera footage, dash camera foot=
+age, and photographs from the following facilities:<o:p></o:p></span></b></=
+p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Houston Police Department<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Investigator: K. Galvez<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">1200 Travis Street<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Houston, Texas 77002<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><b><span style=3D"font-family:&quot;Times New Roman&=
+quot;,serif">Case ID: 0002676225H<o:p></o:p></span></b></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><b><u><span style=3D"font-family:&quot;Times New Rom=
+an&quot;,serif">PLAINTIFF=92S COUNSEL:<o:p></o:p></span></u></b></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Misha J. Paltiyevich<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Zehl &amp; Associates, P.C.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">2700 Post Oak Blvd, Ste 1000<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Houston, TX&nbsp; 77056<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Phone: 713-491-6064<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Fax: 713-583-8545<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif">Email: <a href=3D"mailto:eservice@zehllaw.com">
+eservice@zehllaw.com</a><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><b><s=
+pan style=3D"font-family:&quot;Times New Roman&quot;,serif;color:#00AEEF;ms=
+o-ligatures:none">Deanna Briceno</span></b><b><span style=3D"font-size:11.0=
+pt;line-height:120%;font-family:&quot;Times New Roman&quot;,serif;color:#00=
+AEEF;mso-ligatures:none"><o:p></o:p></span></b></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><b><s=
+pan style=3D"font-size:10.0pt;line-height:120%;font-family:&quot;Times New =
+Roman&quot;,serif;color:#333333;mso-ligatures:none">Legal Assistant to Bran=
+don K. Best<o:p></o:p></span></b></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><b><s=
+pan style=3D"font-size:8.0pt;line-height:120%;font-family:&quot;Times New R=
+oman&quot;,serif;color:#333333;mso-ligatures:none"><o:p>&nbsp;</o:p></span>=
+</b></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><b><s=
+pan style=3D"font-size:10.0pt;line-height:120%;font-family:&quot;Times New =
+Roman&quot;,serif;color:#333333;mso-ligatures:none">Bush + Ramirez<o:p></o:=
+p></span></b></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><span=
+ style=3D"font-size:10.0pt;line-height:120%;font-family:&quot;Times New Rom=
+an&quot;,serif;color:#666666;mso-ligatures:none">5615 Kirby Drive<o:p></o:p=
+></span></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><span=
+ style=3D"font-size:10.0pt;line-height:120%;font-family:&quot;Times New Rom=
+an&quot;,serif;color:#666666;mso-ligatures:none">Suite 900<o:p></o:p></span=
+></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><span=
+ style=3D"font-size:10.0pt;line-height:120%;font-family:&quot;Times New Rom=
+an&quot;,serif;color:#666666;mso-ligatures:none">Houston, Texas 77005<o:p><=
+/o:p></span></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><span=
+ style=3D"font-size:10.0pt;line-height:120%;font-family:&quot;Times New Rom=
+an&quot;,serif;color:#666666;mso-ligatures:none"><o:p>&nbsp;</o:p></span></=
+p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><span=
+ style=3D"font-size:10.0pt;line-height:120%;font-family:&quot;Times New Rom=
+an&quot;,serif;color:#666666;mso-ligatures:none">713-626-1555 Main<o:p></o:=
+p></span></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><span=
+ style=3D"font-size:10.0pt;line-height:120%;font-family:&quot;Times New Rom=
+an&quot;,serif;color:#666666;mso-ligatures:none">713-800-3508 Direct
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><span=
+ style=3D"font-size:10.0pt;line-height:120%;font-family:&quot;Times New Rom=
+an&quot;,serif;color:#666666;mso-ligatures:none">713-622-8077 Fax<o:p></o:p=
+></span></p>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><span=
+ style=3D"font-size:9.0pt;line-height:120%;font-family:&quot;Times New Roma=
+n&quot;,serif;color:#666666;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p=
+>
+<p class=3D"MsoNormal" style=3D"line-height:120%;text-autospace:none"><span=
+ style=3D"font-size:10.0pt;line-height:120%;font-family:&quot;Times New Rom=
+an&quot;,serif;mso-ligatures:none"><a href=3D"mailto:dbriceno@bushramirez.c=
+om"><span style=3D"color:#0563C1">dbriceno@bushramirez.com</span></a><span =
+style=3D"color:#00AEEF"><o:p></o:p></span></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ti=
+mes New Roman&quot;,serif"><a href=3D"https://nam12.safelinks.protection.ou=
+tlook.com/?url=3Dhttp%3A%2F%2Fwww.bushramirez.com%2F&amp;data=3D05%7C02%7Cm=
+miller%40gulfstreamlegal.com%7Cb17f9f7eeff64c25bf2608de260e9ef2%7Ce64b8cadd=
+81e461f9e6f2539d215e7ba%7C0%7C0%7C638990041404487224%7CUnknown%7CTWFpbGZsb3=
+d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpb=
+CIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&amp;sdata=3DQ85RMgoqUsu8j6QXXlwgNyX3AKuNf3=
+O2uKYmQVUZ%2FBI%3D&amp;reserved=3D0" originalsrc=3D"http://www.bushramirez.=
+com/"><span style=3D"color:#00AEEF;mso-ligatures:none">www.bushramirez.com<=
+/span></a></span><span style=3D"font-size:10.0pt;font-family:&quot;Times Ne=
+w Roman&quot;,serif;color:#666666;mso-ligatures:none">
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:11.0pt;font-family:&quot;Ti=
+mes New Roman&quot;,serif;mso-ligatures:none"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Times New Roman&quo=
+t;,serif;color:black;mso-ligatures:none"><img border=3D"0" width=3D"168" he=
+ight=3D"12" style=3D"width:1.75in;height:.125in" id=3D"_x0000_i1025" src=3D=
+"cid:image001.jpg@01DC554A.C50F3000" alt=3D"http://bushramirez.com/wp-conte=
+nt/uploads/b_r_logotype.jpg"></span><span style=3D"font-size:9.0pt;font-fam=
+ily:&quot;Times New Roman&quot;,serif;color:black;mso-ligatures:none"><o:p>=
+</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:9.0pt;font-family:&quot;Tim=
+es New Roman&quot;,serif;color:#6D6D6D;mso-ligatures:none"><o:p>&nbsp;</o:p=
+></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:9.0pt;font-family:&quot;Tim=
+es New Roman&quot;,serif;color:#6D6D6D;mso-ligatures:none">This email is co=
+nfidential, intended only for the named recipient(s) above, and may contain=
+ information that is privileged, attorney work
+ product, attorney-client material, or exempt from disclosure under applica=
+ble law. If you receive this message in error, or are not the named recipie=
+nt(s), please notify the sender at the phone number above, do not copy this=
+ message, do not disclose its contents
+ to anyone, and delete this email message from your computer. Thank you, Bu=
+sh &amp; Ramirez, PLLC.</span><span style=3D"font-size:11.0pt;font-family:&=
+quot;Times New Roman&quot;,serif;color:black;mso-ligatures:none"><o:p></o:p=
+></span></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+</div>
+</body>
+</html>
+
+--_000_SN6PR17MB223923ABCECAD2DA4A150B6DD5C9ASN6PR17MB2239namp_--
+
+--_004_SN6PR17MB223923ABCECAD2DA4A150B6DD5C9ASN6PR17MB2239namp_
+Content-Type: image/jpeg; name="image001.jpg"
+Content-Description: image001.jpg
+Content-Disposition: inline; filename="image001.jpg"; size=1745;
+	creation-date="Fri, 14 Nov 2025 15:41:44 GMT";
+	modification-date="Tue, 18 Nov 2025 17:15:32 GMT"
+Content-ID: <image001.jpg@01DC554A.C50F3000>
+Content-Transfer-Encoding: base64
+
+/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIf
+IiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7
+Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAMAKcDASIA
+AhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQA
+AAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3
+ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm
+p6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEA
+AwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx
+BhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK
+U1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3
+uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDB0+O2
+Twb9qt9I1EakrErqUQ/dx4PU+wr0zxncG4+FxnW4FwzxREyr0Y5GTXlWja/qwtovD8d9LFYTEq6J
+gHBPIzXug8P6e3hddDMZ+x/Z9m3POMevrQMxfGzY+FV0c/8ALpHz/wB80niSw1bUvh/aW+k7ml8q
+Iyxq+1pEwMgGvPtGvr/XfE0XhLUL+4l0qGXaI9wyyqeATjkV6Z46ln03wm89hcSWslsVMZiOMY7f
+SgRjeBP+EdtdZktbPT77SdR8n57W5JxIP7w7H61WutdOhfFHVZf7Pu74SWka7LVNxX3PtVP4W3Nz
+4n1ifXNXuJLi8tUMURJwqqfaui0tQPixrJ7myioAp+AdQOqeMPEt2bea2EjRnyplw68dxXZapetY
+2jSpG7tg42jOPrXM+FlA8f8Aik9y8X8q7F0WRWRxuUjBB71UWk7vYmabi0nqU9Kvmv7VZHiZG2jO
+4YB+lcP8ThYNrOhLqiyNZF281YwSxHtivRI0WNAiKFUDgDtXHeLUVvGnhosM4kc8/SlJpu6QQUlF
+KTuzH8D/AGV/GUp8Ltc/2CtuVnEudvndsZrQ+JN9HdNp/hj7ZHaf2jJunldtoWNff6023H9ifFpr
+Cw/dWuo2xnni/h3juB2pulaZZ+IPH+vy6rbpdfZgkMSSDKqv09aRRf8Ahvq4vNFm0x51ml0uZoN6
+tnemflb8q5jVP7VtPiRq+s6WzSNp8SNPb/8APaLuB71t2tnb6H8WIrTTYVtre8sC8sSDCkg8HFWd
+FQH4na+SM5t4+DQBy8Uuq6n450HxBqQaCO+lYWtqesUYHGfc10+sE/8AC1dEGeDayUvipF/4Tbwv
+gY2yPgDtxRq6g/FPRT3FrJQM57xqNDb4jKPEAlNmLHI8sHg568Vs/DTez6nJZG4/sIyD7AJzk474
+9qmmhjm+LeyRFdW03BDDI61B4HZtO8V67oFuzfYLaXfDGxz5ZPUA+lAjkRBo8/iLW/7T0LUtTcXZ
+CvaKSqD0PvXqI0PS7zwnHpMsEkWntCAYnbayL1wTXjes+J9Y8PeJdXi0u8aBJbhndQAcmu91jU72
+7+DQvpbh/tM9su+RTgnJ5oAwdN8C6L4n1+f+yoZrfRLMGNp/MJNxJ/s57CiuOs/G3iLTbWOzs9Tk
+hgiG1EUDA/SigD//2Q==
+
+--_004_SN6PR17MB223923ABCECAD2DA4A150B6DD5C9ASN6PR17MB2239namp_--
