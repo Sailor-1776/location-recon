@@ -494,39 +494,6 @@ function drawPlacements(
 		const padding = 3;
 		const actualX = resolveTextX(placement.x, pageWidth, textWidth, padding);
 
-		page.drawRectangle({
-			x: actualX - padding,
-			y: placement.y - textHeight - padding,
-			width: textWidth + padding * 2,
-			height: textHeight + padding * 2,
-			color: rgb(1, 1, 0.8),
-		});
-
-		page.drawLine({
-			start: { x: actualX - padding, y: placement.y - textHeight - padding },
-			end: { x: actualX + textWidth + padding, y: placement.y - textHeight - padding },
-			thickness: 1,
-			color: rgb(1, 0, 0),
-		});
-		page.drawLine({
-			start: { x: actualX + textWidth + padding, y: placement.y - textHeight - padding },
-			end: { x: actualX + textWidth + padding, y: placement.y + padding },
-			thickness: 1,
-			color: rgb(1, 0, 0),
-		});
-		page.drawLine({
-			start: { x: actualX + textWidth + padding, y: placement.y + padding },
-			end: { x: actualX - padding, y: placement.y + padding },
-			thickness: 1,
-			color: rgb(1, 0, 0),
-		});
-		page.drawLine({
-			start: { x: actualX - padding, y: placement.y + padding },
-			end: { x: actualX - padding, y: placement.y - textHeight - padding },
-			thickness: 1,
-			color: rgb(1, 0, 0),
-		});
-
 		page.drawText(placement.text, {
 			x: actualX,
 			y: placement.y,
