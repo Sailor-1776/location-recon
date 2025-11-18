@@ -10,7 +10,7 @@ import { isAddressExact, isNameExact } from '../../../../../match/scorers';
 import { extractText } from '../../../../../ingest/pdfReader';
 import type { PdfTextExtraction } from '../../../../../ingest/pdfReader';
 import { annotatePdfWithSearchKeysImproved } from '../../../../../ingest/pdfAnnotator';
-import { extractWarningMessage } from '../../../../../llm/assistant';
+import { extractWarningMessage, extractSearchKeyFromWarning } from '../../../../../llm/assistant';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
@@ -261,20 +261,37 @@ export async function POST(req: NextRequest) {
 				let search_key: string | undefined = undefined;
 				
 				if (isNonOrder && match.record) {
-					// Department column says "Non-Order": return full warning text instead of search key
-					try {
-						const extractedWarning = await extractWarningMessage(match.record);
-						if (extractedWarning) {
-							warningMessage = extractedWarning;
-						} else {
-							// Fallback if no warning in record
-							warningMessage = match.record.warning || 'NON-ORDER: Research Required';
+					// Department column says "Non-Order": return search key with "-non" suffix
+					// First, get or generate the search key from the Search Key column
+					const baseSearchKey = match.record.search_key ||
+						canonicalKey({
+							name: match.record.name,
+							address1: match.record.address1,
+							city: match.record.city,
+							state: match.record.state,
+							postal_code: match.record.postal_code,
+						});
+					
+					// Append "-non" if not already present
+					search_key = baseSearchKey.endsWith('-non') ? baseSearchKey : `${baseSearchKey}-non`;
+					
+					// Extract search-key-like pattern from warning field and append to search_key
+					if (match.record.warning) {
+						try {
+							const extractedFromWarning = extractSearchKeyFromWarning(match.record.warning, search_key);
+							if (extractedFromWarning) {
+								logger.info('Extracted search key pattern from warning', {
+									searchKey: search_key,
+									extractedFromWarning,
+									warning: match.record.warning.substring(0, 100)
+								});
+								// Append the extracted pattern to the right of SEARCHKEY-non
+								search_key = `${search_key} ${extractedFromWarning}`;
+							}
+						} catch (e: any) {
+							logger.warn('Failed to extract search key from warning', { error: e?.message });
 						}
-					} catch (e: any) {
-						logger.warn('Failed to extract warning message', { error: e?.message });
-						warningMessage = match.record.warning || 'NON-ORDER: Research Required';
 					}
-					// Don't set search_key for Non-Order departments
 				} else if (found && match.record) {
 					// Department is not "Non-Order" and we have a match: return search key
 					// Return search key for both EXACT and CLOSE matches (department already verified in reconcileOne)

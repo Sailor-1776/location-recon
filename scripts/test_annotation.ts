@@ -24,7 +24,7 @@ import { reconcileOne } from '../src/match/matcher';
 import { canonicalKey } from '../src/types';
 import { isAddressExact, isNameExact } from '../src/match/scorers';
 import { loadConfig } from '../src/config';
-import { extractWarningMessage } from '../src/llm/assistant';
+import { extractSearchKeyFromWarning } from '../src/llm/assistant';
 
 async function testAnnotation() {
 	console.log('Testing PDF annotation...\n');
@@ -114,11 +114,29 @@ async function testAnnotation() {
 				let search_key: string | undefined = undefined;
 				
 				if (isNonOrder && match.record) {
-					try {
-						const extractedWarning = await extractWarningMessage(match.record);
-						warningMessage = extractedWarning || match.record.warning || 'NON-ORDER: Research Required';
-					} catch (_warningError) {
-						warningMessage = match.record.warning || 'NON-ORDER: Research Required';
+					// For Non-Order departments, return search key with "-non" suffix
+					const baseSearchKey = match.record.search_key || canonicalKey({
+						name: match.record.name,
+						address1: match.record.address1,
+						city: match.record.city,
+						state: match.record.state,
+						postal_code: match.record.postal_code,
+					});
+					
+					// Append "-non" if not already present
+					search_key = baseSearchKey.endsWith('-non') ? baseSearchKey : `${baseSearchKey}-non`;
+					
+					// Extract search-key-like pattern from warning field and append to search_key
+					if (match.record.warning) {
+						try {
+							const extractedFromWarning = extractSearchKeyFromWarning(match.record.warning, search_key);
+							if (extractedFromWarning) {
+								// Append the extracted pattern to the right of SEARCHKEY-non
+								search_key = `${search_key} ${extractedFromWarning}`;
+							}
+						} catch (_warningError) {
+							// Ignore extraction errors
+						}
 					}
 				} else if (found && match.record) {
 					search_key = match.record.search_key || canonicalKey({

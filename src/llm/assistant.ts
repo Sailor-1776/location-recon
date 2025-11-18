@@ -117,4 +117,155 @@ export async function extractWarningMessage(record: LocationRecord): Promise<str
 	return warningText;
 }
 
+/**
+ * Extracts search-key-like patterns from a warning message.
+ * Looks for patterns like "SVPT-M", "UTPHYS-M", "COLLACARE-M" that appear after "Issue to:" 
+ * or similar prefixes in the warning text.
+ * 
+ * @param warningText - The warning text to search
+ * @param searchKey - The search key to compare against (optional, for similarity matching)
+ * @returns The extracted search-key-like pattern, or null if none found
+ */
+export function extractSearchKeyFromWarning(warningText: string, searchKey?: string): string | null {
+	if (!warningText || !warningText.trim()) {
+		return null;
+	}
+
+	const text = warningText.trim();
+	
+	// Pattern to match search-key-like strings:
+	// - Uppercase letters and numbers
+	// - May contain dashes
+	// - Typically appears after "Issue to:" or similar prefixes
+	// - Examples: "SVPT-M", "UTPHYS-M", "COLLACARE-M", "ABILENERMC-M"
+	const searchKeyPattern = /\b([A-Z0-9]+(?:-[A-Z0-9]+)*)\b/g;
+	
+	// Look for patterns after common prefixes
+	const prefixes = [
+		/Issue\s+to:\s*/i,
+		/Issue\s+to\s*/i,
+		/Send\s+to:\s*/i,
+		/Send\s+to\s*/i,
+	];
+	
+	let candidates: Array<{ match: string; position: number; similarity?: number }> = [];
+	
+	// First, try to find patterns after known prefixes
+	for (const prefix of prefixes) {
+		const prefixMatch = text.match(prefix);
+		if (prefixMatch) {
+			const afterPrefix = text.substring(prefixMatch.index! + prefixMatch[0].length);
+			// Look for search key pattern, but stop at separators like "---" or "--"
+			const separatorMatch = afterPrefix.match(/^([A-Z0-9]+(?:-[A-Z0-9]+)*)(?:\s*---|\s*--|\s*$)/);
+			if (separatorMatch) {
+				const candidate = separatorMatch[1];
+				if (candidate && candidate.length >= 3) {
+					candidates.push({
+						match: candidate,
+						position: 0,
+					});
+					// If we found a candidate after a prefix, use it
+					break;
+				}
+			} else {
+				// Fallback: try the regex pattern match
+				const matches = Array.from(afterPrefix.matchAll(searchKeyPattern));
+				const firstMatch = matches[0];
+				if (matches.length > 0 && firstMatch && firstMatch[1] && firstMatch.index !== undefined) {
+					const candidate = firstMatch[1];
+					const matchIndex = firstMatch.index;
+					// Extract up to the first separator if present
+					const separatorIndex = afterPrefix.indexOf('---', matchIndex);
+					const dashIndex = afterPrefix.indexOf('--', matchIndex);
+					let endIndex = separatorIndex !== -1 ? separatorIndex : (dashIndex !== -1 ? dashIndex : undefined);
+					
+					if (endIndex !== undefined && endIndex > matchIndex) {
+						const beforeSeparator = afterPrefix.substring(matchIndex, endIndex).trim();
+						const cleanMatch = beforeSeparator.match(/^([A-Z0-9]+(?:-[A-Z0-9]+)*)/);
+						if (cleanMatch && cleanMatch[1] && cleanMatch[1].length >= 3) {
+							candidates.push({
+								match: cleanMatch[1],
+								position: 0,
+							});
+							break;
+						}
+					} else if (candidate.length >= 3) {
+						candidates.push({
+							match: candidate,
+							position: 0,
+						});
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	// If no prefix match, search the entire text for search-key-like patterns
+	if (candidates.length === 0) {
+		const matches = Array.from(text.matchAll(searchKeyPattern));
+		for (const match of matches) {
+			const candidate = match[1];
+			const matchIndex = match.index;
+			// Filter out very short matches and common false positives
+			if (candidate && candidate.length >= 3 && 
+			    !/^(THE|AND|OR|TO|FOR|WITH|FROM)$/i.test(candidate) &&
+			    matchIndex !== undefined) {
+				candidates.push({
+					match: candidate,
+					position: matchIndex,
+				});
+			}
+		}
+	}
+	
+	if (candidates.length === 0) {
+		return null;
+	}
+	
+	// If we have a search key to compare against, find the most similar candidate
+	if (searchKey) {
+		const searchKeyBase = searchKey.replace(/-non$/, '').toUpperCase();
+		
+		for (const candidate of candidates) {
+			// Calculate similarity (simple character overlap)
+			const candidateUpper = candidate.match.toUpperCase();
+			const similarity = calculateSimilarity(searchKeyBase, candidateUpper);
+			candidate.similarity = similarity;
+		}
+		
+		// Sort by similarity (highest first) and return the best match
+		candidates.sort((a, b) => (b.similarity || 0) - (a.similarity || 0));
+		const bestCandidate = candidates[0];
+		return bestCandidate ? bestCandidate.match : null;
+	}
+	
+	// Otherwise, return the first candidate (usually the one after "Issue to:")
+	const firstCandidate = candidates[0];
+	return firstCandidate ? firstCandidate.match : null;
+}
+
+/**
+ * Calculates a simple similarity score between two strings.
+ * Returns a value between 0 and 1, where 1 is identical.
+ */
+function calculateSimilarity(str1: string, str2: string): number {
+	if (!str1 || !str2) return 0;
+	if (str1 === str2) return 1.0;
+	
+	// Check if one contains the other
+	if (str1.includes(str2) || str2.includes(str1)) {
+		return 0.8;
+	}
+	
+	// Count common characters
+	const set1 = new Set(str1);
+	const set2 = new Set(str2);
+	const intersection = new Set([...set1].filter(x => set2.has(x)));
+	const union = new Set([...set1, ...set2]);
+	
+	if (union.size === 0) return 0;
+	return intersection.size / union.size;
+}
+
 
