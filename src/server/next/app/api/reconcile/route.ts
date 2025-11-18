@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { extractCandidateBlocks, extractStructuredFacilities, filterMedicalBlocks } from '../../../../../ingest/textUtils';
+import { extractCandidateBlocks, extractStructuredFacilities, filterMedicalBlocks, blocksToStrings, type BlockWithPosition } from '../../../../../ingest/textUtils';
 import { normalizeAddress } from '../../../../../normalize/address';
 import { getDAO } from '../../../../../match/locationsDAO';
 import { loadConfig } from '../../../../../config';
@@ -74,8 +74,9 @@ export async function POST(req: NextRequest) {
 		const inputText = formData.get('text');
 		if (typeof inputText === 'string' && inputText.trim()) {
 			const blocks = extractCandidateBlocks(inputText);
-			for (const block of blocks) {
+			for (const blockWithPos of blocks) {
 				try {
+					const block = blockWithPos.block;
 					const canonical = normalizeAddress(block);
 					const match = await reconcileOne(canonical, dao);
 				const name_exact = !!(match.record && isNameExact(canonical.name, match.record.name));
@@ -104,7 +105,7 @@ export async function POST(req: NextRequest) {
 					note: found ? undefined : 'User needs to conduct research.',
 				});
 				} catch (e: any) {
-					logger.error('Failed to process text block', { message: e?.message, block: block.substring(0, 100) });
+					logger.error('Failed to process text block', { message: e?.message, block: blockWithPos.block.substring(0, 100) });
 					// Continue processing other blocks
 				}
 			}
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest) {
 			buffer: Buffer;
 			text: string;
 			textExtraction: PdfTextExtraction;
-			blocks: Array<{ block: string; searchKey?: string; warningMessage?: string }>;
+			blocks: Array<{ block: string; searchKey?: string; warningMessage?: string; pageIndex?: number; y?: number; x?: number; maxX?: number; facilityNameLine?: string }>;
 		}> = [];
 		
 		for (const f of files) {
@@ -152,13 +153,15 @@ export async function POST(req: NextRequest) {
 			}
 			
 			// Use structured facility extraction for PDFs, fallback to candidate blocks for other formats
-			let blocks = isPdf && text.trim()
-				? extractStructuredFacilities(text)
-				: extractCandidateBlocks(text);
+			// Pass positional pages data if available for accurate Y-axis positioning
+			const pages = textExtraction?.pages;
+			let blocks: BlockWithPosition[] = isPdf && text.trim()
+				? extractStructuredFacilities(text, pages)
+				: extractCandidateBlocks(text, pages);
 			// Fallback: if structured extraction finds nothing for PDFs, try candidate heuristics
 			if (isPdf && blocks.length === 0 && text.trim()) {
 				logger.warn('Structured facility extraction returned no blocks; falling back to candidate block extraction');
-				blocks = extractCandidateBlocks(text);
+				blocks = extractCandidateBlocks(text, pages);
 			}
 			
 			// Filter blocks to only include those with medical/healthcare keywords
@@ -177,11 +180,15 @@ export async function POST(req: NextRequest) {
 				isPdf,
 				blocksCount: blocks.length,
 				textLength: text.length,
+				hasPositionData: blocks.some(b => b.y > 0),
 				blocks: blocks.map((block, idx) => ({
 					index: idx + 1,
-					preview: block.substring(0, 200),
-					fullBlock: block,
-					lineCount: block.split(/\r?\n/).length
+					preview: block.block.substring(0, 200),
+					fullBlock: block.block,
+					lineCount: block.block.split(/\r?\n/).length,
+					hasPosition: block.y > 0,
+					pageIndex: block.pageIndex,
+					y: block.y
 				}))
 			});
 
@@ -214,12 +221,16 @@ export async function POST(req: NextRequest) {
 				});
 			}
 			
-			for (const block of blocks) {
+			for (const blockWithPos of blocks) {
 				try {
+					const block = blockWithPos.block;
 					logger.info('Processing block', {
-						blockIndex: blocks.indexOf(block) + 1,
+						blockIndex: blocks.indexOf(blockWithPos) + 1,
 						totalBlocks: blocks.length,
-						blockPreview: block.substring(0, 150)
+						blockPreview: block.substring(0, 150),
+						hasPosition: blockWithPos.y > 0,
+						pageIndex: blockWithPos.pageIndex,
+						y: blockWithPos.y
 					});
 					const ca = normalizeAddress(block);
 					logger.info('Normalized address', {
@@ -287,7 +298,7 @@ export async function POST(req: NextRequest) {
 					// Only add blocks that have searchKey or warningMessage for annotation
 					if (search_key || warningMessage) {
 						logger.info('Adding block to PDF annotation', { 
-							blockIndex: blocks.indexOf(block) + 1,
+							blockIndex: blocks.indexOf(blockWithPos) + 1,
 							totalBlocks: blocks.length,
 							block: block, // Full block text
 							blockPreview: block.substring(0, 150),
@@ -296,12 +307,25 @@ export async function POST(req: NextRequest) {
 							hasWarning: !!warningMessage,
 							matchStatus: match.status,
 							parsedName: ca.name,
-							parsedAddress: `${ca.address1}, ${ca.city}, ${ca.state} ${ca.postal_code}`
+							parsedAddress: `${ca.address1}, ${ca.city}, ${ca.state} ${ca.postal_code}`,
+							hasPosition: blockWithPos.y > 0,
+							pageIndex: blockWithPos.pageIndex,
+							y: blockWithPos.y
 						});
-						pdfFile.blocks.push({ block, searchKey: search_key, warningMessage });
+						// Include position data in the annotation block
+						pdfFile.blocks.push({ 
+							block, 
+							searchKey: search_key, 
+							warningMessage,
+							pageIndex: blockWithPos.pageIndex,
+							y: blockWithPos.y,
+							x: blockWithPos.x,
+							maxX: blockWithPos.maxX,
+							facilityNameLine: blockWithPos.facilityNameLine
+						});
 					} else {
 						logger.info('Skipping block (no searchKey or warningMessage)', { 
-							blockIndex: blocks.indexOf(block) + 1,
+							blockIndex: blocks.indexOf(blockWithPos) + 1,
 							totalBlocks: blocks.length,
 							block: block, // Full block text
 							blockPreview: block.substring(0, 150),
@@ -329,7 +353,7 @@ export async function POST(req: NextRequest) {
 					},
 				);
 				} catch (e: any) {
-					logger.error('Failed to process file block', { message: e?.message, file: f.name, block: block.substring(0, 100) });
+					logger.error('Failed to process file block', { message: e?.message, file: f.name, block: blockWithPos.block.substring(0, 100) });
 					// Continue processing other blocks
 				}
 			}

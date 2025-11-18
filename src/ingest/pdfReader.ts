@@ -149,28 +149,32 @@ async function extractLayoutWithPdfjs(path: string, logger: ReturnType<typeof ge
 }
 
 async function getPdfjsLib(): Promise<PdfJsLib | null> {
+	// Use legacy build for Node.js compatibility (avoids DOMMatrix errors)
+	// pdfjs-dist is externalized in Next.js, so we need to use dynamic imports
+	// eslint-disable-next-line @typescript-eslint/no-implied-eval
+	const dynamicImport = new Function('m', 'return import(m)');
+	
+	// Try .mjs extension first (for pdfjs-dist 5.4+)
 	try {
-		// Use legacy build for Node.js compatibility (avoids DOMMatrix errors)
-		// eslint-disable-next-line @typescript-eslint/no-implied-eval
-		const dynamicImport = new Function('m', 'return import(m)');
-		const pdfjsLib = (await dynamicImport('pdfjs-dist/legacy/build/pdf')) as PdfJsLib;
-		// @ts-expect-error any
-		if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
-			// @ts-expect-error any
-			pdfjsLib.GlobalWorkerOptions.workerSrc = undefined as unknown as string;
-		}
+		const pdfjsLib = (await dynamicImport('pdfjs-dist/legacy/build/pdf.mjs')) as PdfJsLib;
+		// Don't set workerSrc in Node.js - it's not needed and causes errors
 		return pdfjsLib;
-	} catch {
+	} catch (mjsError) {
+		// Fallback to non-.mjs path (for older versions or if .mjs fails)
 		try {
-			const require = createRequire(import.meta.url);
-			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const fallback = require('pdfjs-dist/legacy/build/pdf') as PdfJsLib;
-			if (fallback && fallback.GlobalWorkerOptions) {
-				fallback.GlobalWorkerOptions.workerSrc = undefined as unknown as string;
+			const pdfjsLib = (await dynamicImport('pdfjs-dist/legacy/build/pdf')) as PdfJsLib;
+			return pdfjsLib;
+		} catch (legacyError) {
+			// Last resort: try require() for CommonJS builds (won't work for .mjs files)
+			try {
+				const require = createRequire(import.meta.url);
+				// eslint-disable-next-line @typescript-eslint/no-var-requires
+				const fallback = require('pdfjs-dist/legacy/build/pdf') as PdfJsLib;
+				return fallback;
+			} catch {
+				// All methods failed
+				return null;
 			}
-			return fallback;
-		} catch {
-			return null;
 		}
 	}
 }
