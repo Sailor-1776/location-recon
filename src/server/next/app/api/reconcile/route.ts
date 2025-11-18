@@ -10,6 +10,8 @@ import { isAddressExact, isNameExact } from '../../../../../match/scorers';
 import { extractText } from '../../../../../ingest/pdfReader';
 import type { PdfTextExtraction } from '../../../../../ingest/pdfReader';
 import { annotatePdfWithSearchKeysImproved } from '../../../../../ingest/pdfAnnotator';
+import { parseEmailStructuredFromBuffer } from '../../../../../ingest/emailReader';
+import { convertEmailToPdf } from '../../../../../ingest/emailToPdf';
 import { extractWarningMessage, extractSearchKeyFromWarning } from '../../../../../llm/assistant';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -124,11 +126,67 @@ export async function POST(req: NextRequest) {
 			const buf = Buffer.from(await f.arrayBuffer());
 			let text = '';
 			let textExtraction: PdfTextExtraction | undefined;
+			let processedBuffer = buf;
+			let processedFileName = f.name;
+			
+			// Check if it's an email file
+			const isEmail = f.name.toLowerCase().endsWith('.eml') || f.type === 'message/rfc822';
 			
 			// Check if it's a PDF file
 			const isPdf = f.name.toLowerCase().endsWith('.pdf') || f.type === 'application/pdf';
 			
-			if (isPdf) {
+			if (isEmail) {
+				// Parse email and convert to PDF
+				try {
+					logger.info('Processing email file', { fileName: f.name });
+					const structuredEmail = await parseEmailStructuredFromBuffer(buf);
+					
+					// Convert email to PDF
+					const emailPdfBuffer = await convertEmailToPdf(structuredEmail);
+					processedBuffer = emailPdfBuffer;
+					processedFileName = f.name.replace(/\.eml$/i, '.pdf');
+					
+					// Extract text from the converted PDF
+					const tmpPath = path.join(os.tmpdir(), `email-pdf-${Date.now()}-${Math.random().toString(36).substring(7)}.pdf`);
+					await fs.writeFile(tmpPath, emailPdfBuffer);
+					textExtraction = await extractText(tmpPath);
+					text = textExtraction.text;
+					// Clean up temp file
+					await fs.unlink(tmpPath).catch(() => {});
+					
+					logger.info('Email converted to PDF', {
+						originalFileName: f.name,
+						convertedFileName: processedFileName,
+						textLength: text.length,
+						attachmentCount: structuredEmail.attachments.length,
+						hasHtml: !!structuredEmail.html,
+					});
+					
+					// Handle PDF attachments separately
+					for (const attachment of structuredEmail.attachments) {
+						if (attachment.contentType === 'application/pdf' || attachment.filename.toLowerCase().endsWith('.pdf')) {
+							logger.info('Found PDF attachment in email', {
+								fileName: attachment.filename,
+								size: attachment.size,
+							});
+							// PDF attachments could be processed separately if needed
+							// For now, we'll just log them
+						}
+					}
+				} catch (e: any) {
+					logger.error('Email processing failed', { message: e?.message, stack: e?.stack, file: f.name });
+					// Fallback to text extraction
+					try {
+						const structuredEmail = await parseEmailStructuredFromBuffer(buf);
+						text = structuredEmail.extractedText;
+						textExtraction = { text };
+					} catch (fallbackError: any) {
+						logger.warn('Email fallback extraction failed', { message: fallbackError?.message, file: f.name });
+						text = '';
+						textExtraction = { text };
+					}
+				}
+			} else if (isPdf) {
 				// Extract text from PDF using pdfReader
 				try {
 					// Write buffer to temp file for pdfReader
@@ -152,14 +210,14 @@ export async function POST(req: NextRequest) {
 				}
 			}
 			
-			// Use structured facility extraction for PDFs, fallback to candidate blocks for other formats
+			// Use structured facility extraction for PDFs (including converted emails), fallback to candidate blocks for other formats
 			// Pass positional pages data if available for accurate Y-axis positioning
 			const pages = textExtraction?.pages;
-			let blocks: BlockWithPosition[] = isPdf && text.trim()
+			let blocks: BlockWithPosition[] = (isPdf || isEmail) && text.trim()
 				? extractStructuredFacilities(text, pages)
 				: extractCandidateBlocks(text, pages);
 			// Fallback: if structured extraction finds nothing for PDFs, try candidate heuristics
-			if (isPdf && blocks.length === 0 && text.trim()) {
+			if ((isPdf || isEmail) && blocks.length === 0 && text.trim()) {
 				logger.warn('Structured facility extraction returned no blocks; falling back to candidate block extraction');
 				blocks = extractCandidateBlocks(text, pages);
 			}
@@ -178,6 +236,7 @@ export async function POST(req: NextRequest) {
 			logger.info('Extracted blocks from file', {
 				fileName: f.name,
 				isPdf,
+				isEmail,
 				blocksCount: blocks.length,
 				textLength: text.length,
 				hasPositionData: blocks.some(b => b.y > 0),
@@ -193,7 +252,7 @@ export async function POST(req: NextRequest) {
 			});
 
 			// Debug: log extracted text content
-			if (isPdf) {
+			if (isPdf || isEmail) {
 				const lines = text.split(/\r?\n/);
 				logger.info('PDF text preview', {
 					fileName: f.name,
@@ -210,11 +269,11 @@ export async function POST(req: NextRequest) {
 				});
 			}
 			
-			// Track PDF files and their location blocks for annotation
-			if (isPdf) {
+			// Track PDF files (including converted emails) and their location blocks for annotation
+			if (isPdf || isEmail) {
 				pdfFiles.push({
-					file: f,
-					buffer: buf,
+					file: new File([processedBuffer], processedFileName, { type: 'application/pdf' }),
+					buffer: processedBuffer,
 					text,
 					textExtraction: textExtraction ?? { text },
 					blocks: [],
