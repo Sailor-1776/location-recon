@@ -205,6 +205,196 @@ function findLinePosition(
 }
 
 /**
+ * Checks if a line looks like a numbered list item (e.g., "1. Facility Name" or "12, Facility Name")
+ */
+function looksLikeNumberedListItem(line: string): boolean {
+	// Match patterns like "1. Facility Name" or "12, Facility Name"
+	return /^\d+[.,]\s*[A-Z]/.test(line.trim());
+}
+
+/**
+ * Checks if a line looks like a doctor name (contains MD, DO, PA, NP, RN, DC, etc.)
+ */
+function looksLikeDoctorNameLine(line: string): boolean {
+	if (!line || !line.trim()) return false;
+	// Check for medical credentials
+	return /,\s*(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?|RN|CCMA|FNP|FNP-C|DC\.?)/i.test(line) ||
+	       /\b(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?|RN|CCMA|FNP|FNP-C|DC\.?)\b/i.test(line) ||
+	       // Also check for semicolon-separated names (common pattern)
+	       /;/.test(line);
+}
+
+/**
+ * Extracts facility blocks from numbered list format
+ * Format: "1. Facility Name" followed by doctor names, address, city/state/zip, phone
+ */
+function extractNumberedListBlocks(text: string, pages?: PdfTextPage[]): BlockWithPosition[] {
+	const lines = text
+		.split(/\r?\n/)
+		.map((l) => l.trim())
+		.filter((l) => l.length > 0);
+
+	const blocks: BlockWithPosition[] = [];
+	
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		
+		// Check if this is a numbered list item
+		if (!looksLikeNumberedListItem(line)) continue;
+		
+		// Extract facility name from numbered line (remove number prefix)
+		const facilityNameMatch = line.match(/^\d+[.,]\s*(.+)$/);
+		if (!facilityNameMatch) continue;
+		
+		let facilityNameLine = facilityNameMatch[1].trim();
+		const blockParts: string[] = [facilityNameLine];
+		let currentIndex = i + 1;
+		
+		// Collect doctor name lines (may be multiple lines)
+		const doctorNameLines: string[] = [];
+		let lastDoctorLine = '';
+		while (currentIndex < lines.length) {
+			const nextLine = lines[currentIndex];
+			// Stop if we hit another numbered item
+			if (looksLikeNumberedListItem(nextLine)) break;
+			// Stop if we hit a city/state/zip line (but don't stop for P.O. Box - it's an address)
+			if (looksLikeCityStateZip(nextLine) && !/^P\.?O\.?\s+Box/i.test(nextLine)) break;
+			// Stop if we hit an address line (starts with number and looks like street address, or P.O. Box)
+			// But allow if it's part of a multi-line doctor name list
+			if ((/^\d+\s+[A-Za-z]/.test(nextLine) || /^P\.?O\.?\s+Box/i.test(nextLine)) && 
+			    !looksLikeDoctorNameLine(nextLine) && 
+			    !(lastDoctorLine && /[;,]/.test(lastDoctorLine))) {
+				// This looks like an address - stop collecting doctor names
+				break;
+			}
+			// Collect doctor name lines
+			if (looksLikeDoctorNameLine(nextLine)) {
+				doctorNameLines.push(nextLine);
+				lastDoctorLine = nextLine;
+				currentIndex++;
+			} else if (lastDoctorLine && /[;,]/.test(lastDoctorLine) && /^[A-Z]/.test(nextLine)) {
+				// Continuation of multi-line doctor name list (previous line ended with ; or ,)
+				doctorNameLines[doctorNameLines.length - 1] += ' ' + nextLine;
+				lastDoctorLine = doctorNameLines[doctorNameLines.length - 1];
+				currentIndex++;
+			} else {
+				// If it doesn't look like a doctor name and doesn't start with a number, it might be part of facility name
+				// Check if next line could be continuation of facility name (no comma, no credentials, not an address)
+				if (!nextLine.includes(',') && !/^\d+/.test(nextLine) && currentIndex === i + 1 && !looksLikeCityStateZip(nextLine)) {
+					// Might be continuation of facility name on same numbered line
+					facilityNameLine += ' ' + nextLine;
+					blockParts[0] = facilityNameLine;
+					currentIndex++;
+				} else {
+					// If it's not a doctor name and not an address, it might still be a name line
+					// Check if it looks like a person name (has comma, capital letters)
+					if (/^[A-Z][a-z]+.*,/.test(nextLine) && !looksLikeCityStateZip(nextLine)) {
+						doctorNameLines.push(nextLine);
+						lastDoctorLine = nextLine;
+						currentIndex++;
+					} else {
+						break;
+					}
+				}
+			}
+		}
+		
+		// Add doctor name lines to block
+		blockParts.push(...doctorNameLines);
+		
+		// Now look for address line (starts with number, not a numbered list item)
+		let addressLine = '';
+		let cityStateZipLine = '';
+		if (currentIndex < lines.length) {
+			const candidateAddress = lines[currentIndex];
+			// Check for P.O. Box first (before other address checks)
+			// Also check for "PO Box" (without periods) and "Post Office Box"
+			if (/^P\.?O\.?\s+Box/i.test(candidateAddress) || /^PO\s+Box/i.test(candidateAddress) || /^Post\s+Office\s+Box/i.test(candidateAddress)) {
+				// Handle P.O. Box addresses - they don't have city/state/zip on same line
+				addressLine = candidateAddress;
+				blockParts.push(addressLine);
+				currentIndex++;
+				// City/state/zip will be on next line, handled below
+			} else if (looksLikeCityStateZip(candidateAddress) && /^\d+/.test(candidateAddress)) {
+				// Check if address and city/state/zip are on the same line
+				// Pattern: "123 Main St City, ST 12345" or "719 West Coke Road Winnsboro, TX 75494"
+				// Combined address and city/state/zip on one line
+				// Try to split: find the city/state/zip part
+				const cityStateZipMatch = candidateAddress.match(/,\s*([A-Z]{2}|[A-Za-z]+(?:\s+[A-Za-z]+)*)\s+\d{5}(?:-\d{4})?$/);
+				if (cityStateZipMatch) {
+					const cityStateZipStart = candidateAddress.indexOf(cityStateZipMatch[0]);
+					addressLine = candidateAddress.substring(0, cityStateZipStart).trim();
+					cityStateZipLine = cityStateZipMatch[0].substring(1).trim(); // Remove leading comma
+					blockParts.push(addressLine);
+					blockParts.push(cityStateZipLine);
+					currentIndex++;
+				} else {
+					// Fallback: treat as address only
+					addressLine = candidateAddress;
+					blockParts.push(addressLine);
+					currentIndex++;
+				}
+			} else if (/^\d+/.test(candidateAddress) && !looksLikeNumberedListItem(candidateAddress)) {
+				// Standard address line
+				addressLine = candidateAddress;
+				blockParts.push(addressLine);
+				currentIndex++;
+			}
+		}
+		
+		// Look for city/state/zip line (if not already found in combined address)
+		if (!cityStateZipLine && currentIndex < lines.length) {
+			const candidateCityStateZip = lines[currentIndex];
+			if (looksLikeCityStateZip(candidateCityStateZip)) {
+				cityStateZipLine = candidateCityStateZip;
+				blockParts.push(cityStateZipLine);
+				currentIndex++;
+			}
+		}
+		
+		// If we don't have both address and city/state/zip, this isn't a valid block
+		if (!addressLine || !cityStateZipLine) continue;
+		
+		// Look for phone number (optional)
+		if (currentIndex < lines.length) {
+			const phoneLine = lines[currentIndex];
+			// Check if it's a phone number pattern
+			if (/^\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/.test(phoneLine) && !looksLikeNumberedListItem(phoneLine)) {
+				blockParts.push(phoneLine);
+				currentIndex++;
+			}
+		}
+		
+		const blockText = blockParts.join('\n');
+		
+		// Try to find position of facility name line in PDF
+		const contextLines = addressLine ? [addressLine] : undefined;
+		const position = findLinePosition(facilityNameLine, pages, i, contextLines);
+		
+		if (position && position.y > 0) {
+			blocks.push({
+				block: blockText,
+				facilityNameLine: facilityNameLine,
+				pageIndex: position.pageIndex,
+				y: position.y,
+				x: position.x,
+				maxX: position.maxX,
+			});
+		} else {
+			// Fallback: create block without position (will use search fallback)
+			blocks.push({
+				block: blockText,
+				facilityNameLine: facilityNameLine,
+				pageIndex: 0,
+				y: 0,
+			});
+		}
+	}
+	
+	return blocks;
+}
+
+/**
  * Extracts structured facility information from text following the pattern:
  * Facility name
  * Facility Address
@@ -224,6 +414,19 @@ export function extractStructuredFacilities(text: string, pages?: PdfTextPage[])
 		.split(/\r?\n/)
 		.map((l) => l.trim())
 		.filter((l) => l.length > 0);
+
+	// First, try numbered list extraction (for formats like "1. Facility Name")
+	const numberedBlocks = extractNumberedListBlocks(text, pages);
+	if (numberedBlocks.length > 0) {
+		// Deduplicate while preserving order
+		const seen = new Set<string>();
+		return numberedBlocks.filter((b) => {
+			const key = b.block.toLowerCase().replace(/\s+/g, ' ');
+			if (seen.has(key)) return false;
+			seen.add(key);
+			return true;
+		});
+	}
 
 	const blocks: BlockWithPosition[] = [];
 	
@@ -258,13 +461,13 @@ export function extractStructuredFacilities(text: string, pages?: PdfTextPage[])
 			};
 			
 			// Determine the facility name line
-			// Check if potentialNameLine looks like a doctor name (contains M.D., MD, D.O., DO, D.C., DC, etc.)
+			// Check if potentialNameLine looks like a doctor name (contains M.D., MD, D.O., DO, etc.)
 			// Clean the name line first to handle number prefixes
 			const cleanedPotentialName = cleanNameLine(potentialNameLine);
-			const looksLikeDoctorName = cleanedPotentialName && /,\s*(M\.?D\.?|D\.?O\.?|D\.?C\.?|P\.?A\.?|N\.?P\.?)/i.test(cleanedPotentialName);
+			const looksLikeDoctorName = cleanedPotentialName && /,\s*(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?)/i.test(cleanedPotentialName);
 			
-			let nameLine: string;
-			let blockParts: string[];
+			let nameLine: string = '';
+			let blockParts: string[] = [];
 			
 			if (looksLikeDoctorName && potentialFacilityNameLine) {
 				// We have: facility name, doctor name, address, city/state/zip
@@ -282,6 +485,9 @@ export function extractStructuredFacilities(text: string, pages?: PdfTextPage[])
 				if (!hasValidName) continue;
 				blockParts = [nameLine, addressLine, cityStateZipLine];
 			}
+			
+			// Ensure nameLine is set before proceeding
+			if (!nameLine || blockParts.length === 0) continue;
 			
 			// Stop if we encounter a line that looks like a new facility entry (starts with number)
 			// Examples: "2. Christus Mother Frances Hospital", "3. East Texas Spine Institute"
@@ -357,6 +563,7 @@ function containsMedicalKeywords(block: string): boolean {
 		'clinic',
 		'healthcare',
 		'health care',
+		'health', // Added to catch "Merge Health", "Health Clinics", etc.
 		'physician',
 		'surgeon',
 		'nurse',
@@ -388,8 +595,6 @@ function containsMedicalKeywords(block: string): boolean {
 		'md ',
 		'd.o.',
 		'do ',
-		'd.c.',
-		'dc ',
 		'p.a.',
 		'pa ',
 		'n.p.',
@@ -440,7 +645,16 @@ function containsMedicalKeywords(block: string): boolean {
 		'treatment',
 		'patient',
 		'provider',
-		'chiropractic',
+		// Additional keywords for medical providers list
+		'spine', // For "Equinox Spine", "East Texas Spine Institute"
+		'chiropractic', // For "Chiropractic Associates"
+		'anesthesia', // For "Lighthouse Anesthesia"
+		'monitoring', // For "Fairview Monitoring Services"
+		'diagnostics', // For "Mission Diagnostics"
+		'associates', // Common in medical facility names
+		'llc', // Many medical practices are LLCs
+		'pllc', // Professional Limited Liability Company
+		'pa', // Professional Association
 	];
 
 	const blockLower = block.toLowerCase();
