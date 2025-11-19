@@ -7,6 +7,7 @@ import {
 	EXACT_ADDR_MIN,
 	EXACT_NAME_MIN,
 	expandAbbrev,
+	extractIndividualNames,
 	fullAddressString,
 	fullDbAddressString,
 	isAddressExact,
@@ -117,15 +118,45 @@ function computeScores(
 	const nameA = (doc.name || '').toString();
 	const nameB = db.name || '';
 	
-	// Check for doctor pattern match first (e.g., "Rafath Quraishi MD" matches "Dr. Rafath Quraishi")
-	// If it matches, boost the score significantly
+	// Check if input has multiple names (semicolon-separated)
+	const individualNames = extractIndividualNames(nameA);
+	
+	// Check if database record is a facility (doesn't start with "Dr.")
+	const recNameLower = nameB.toLowerCase().trim();
+	const isFacilityRecord = !/^(dr\.?|doctor)\s+/.test(recNameLower);
+	
 	let name: number;
-	if (matchesDoctorPattern(nameA, nameB)) {
-		// Give a high score (98) for doctor pattern matches
-		name = 98;
+	
+	if (individualNames.length > 1) {
+		// Multiple names present - check each one
+		let bestScore = 0;
+		
+		// If database record is a facility, prioritize matching the first name (usually facility name)
+		// Otherwise, check all names equally
+		const namesToCheck = isFacilityRecord && individualNames.length > 0 
+			? [individualNames[0], ...individualNames.slice(1)] // Check facility name first
+			: individualNames;
+		
+		for (const individualName of namesToCheck) {
+			// Check doctor pattern for individual name
+			if (matchesDoctorPattern(individualName, nameB)) {
+				bestScore = Math.max(bestScore, 98);
+			} else {
+				// Use fuzzy matching
+				const score = fuzzball.token_sort_ratio(individualName, nameB);
+				bestScore = Math.max(bestScore, score);
+			}
+		}
+		name = bestScore;
 	} else {
-		// Otherwise use standard fuzzy matching
-		name = fuzzball.token_sort_ratio(nameA, nameB);
+		// Single name - check for doctor pattern match first
+		if (matchesDoctorPattern(nameA, nameB)) {
+			// Give a high score (98) for doctor pattern matches
+			name = 98;
+		} else {
+			// Otherwise use standard fuzzy matching
+			name = fuzzball.token_sort_ratio(nameA, nameB);
+		}
 	}
 	
 	const addrA = expandAbbrev(fullAddressString(doc));
@@ -219,6 +250,39 @@ function departmentsMatch(doc: CanonicalAddress, rec: LocationRecord): boolean {
 	return false;
 }
 
+/**
+ * Reconciles multiple individual names from a canonical address that contains semicolon-separated names.
+ * Returns matches for each individual name that has an exact match.
+ */
+export async function reconcileMultipleNames(
+	doc: CanonicalAddress,
+	dao: LocationsDAO,
+): Promise<MatchResult[]> {
+	const individualNames = extractIndividualNames(doc.name);
+	
+	// If only one name, use the regular reconcileOne
+	if (individualNames.length <= 1) {
+		const result = await reconcileOne(doc, dao);
+		return [result];
+	}
+	
+	// Multiple names - process each one separately
+	const results: MatchResult[] = [];
+	
+	for (const individualName of individualNames) {
+		// Create a new canonical address with just this individual name
+		const individualDoc: CanonicalAddress = {
+			...doc,
+			name: individualName.trim(),
+		};
+		
+		const match = await reconcileOne(individualDoc, dao);
+		results.push(match);
+	}
+	
+	return results;
+}
+
 export async function reconcileOne(doc: CanonicalAddress, dao: LocationsDAO): Promise<MatchResult> {
 	const logger = getLogger();
 	const blockingKey = doc.postal_code
@@ -241,29 +305,152 @@ export async function reconcileOne(doc: CanonicalAddress, dao: LocationsDAO): Pr
 	// Step 1: Check for exact matches (name and address) FIRST, before department filtering
 	// Exact matches should always be returned regardless of department differences
 	// Also check for doctor pattern matches (e.g., "Rafath Quraishi MD" matches "Dr. Rafath Quraishi")
+	// Prioritize facility name matches over individual name matches
+	const facilityMatches: Array<{ rec: LocationRecord; scores: MatchResult['scores'] }> = [];
+	const individualNameMatches: Array<{ rec: LocationRecord; scores: MatchResult['scores'] }> = [];
+	
 	for (const rec of allCandidates) {
-		const nameExact = isNameExact(doc.name, rec.name) || matchesDoctorPattern(doc.name, rec.name);
 		const addressExact = isAddressExact(doc, rec);
+		
+		if (!addressExact) continue;
+		
+		// Check if any individual name matches (for cases with multiple names separated by semicolons)
+		const individualNames = extractIndividualNames(doc.name);
+		let nameMatches = false;
+		
+		// Check full name first (for exact matches)
+		if (isNameExact(doc.name, rec.name) || matchesDoctorPattern(doc.name, rec.name)) {
+			nameMatches = true;
+		} else if (individualNames.length > 1) {
+			// If we have multiple names, check each individual name
+			for (const individualName of individualNames) {
+				if (isNameExact(individualName, rec.name) || matchesDoctorPattern(individualName, rec.name)) {
+					nameMatches = true;
+					break;
+				}
+			}
+		}
 
-		if (nameExact && addressExact) {
-			// Found exact match - return immediately (department doesn't matter for exact matches)
+		if (nameMatches) {
 			const scores = computeScores(doc, rec);
-			logger.info('Exact match found (before department filtering)', {
+			
+			// Check if this is a facility match (doesn't start with "Dr.") vs individual name match
+			const recNameLower = (rec.name || '').toString().toLowerCase().trim();
+			const isFacilityMatch = !/^(dr\.?|doctor)\s+/.test(recNameLower);
+			
+			if (isFacilityMatch) {
+				facilityMatches.push({ rec, scores });
+			} else {
+				individualNameMatches.push({ rec, scores });
+			}
+		}
+	}
+	
+	// Prefer facility matches over individual name matches, but only if facility match is strong
+	// If we have both facility and individual names, check if individual name matches are better
+	if (facilityMatches.length > 0 && individualNameMatches.length > 0) {
+		// We have both types of matches - prefer facility if it's a strong match, otherwise use individual
+		const bestFacility = facilityMatches.reduce((best, current) => {
+			const sumBest = best.scores.name + best.scores.address + (best.scores.department ?? 0);
+			const sumCurrent = current.scores.name + current.scores.address + (current.scores.department ?? 0);
+			return sumCurrent > sumBest ? current : best;
+		});
+		
+		const bestIndividual = individualNameMatches.reduce((best, current) => {
+			const sumBest = best.scores.name + best.scores.address + (best.scores.department ?? 0);
+			const sumCurrent = current.scores.name + current.scores.address + (current.scores.department ?? 0);
+			return sumCurrent > sumBest ? current : best;
+		});
+		
+		// If facility match has high name score (>= 94), prefer it; otherwise prefer individual name match
+		if (bestFacility.scores.name >= EXACT_NAME_MIN) {
+			logger.info('Exact facility match found (preferred over individual)', {
 				docName: doc.name,
-				recName: rec.name,
+				recName: bestFacility.rec.name,
 				docDept: doc.department,
-				recDept: rec.department,
-				doctorPatternMatch: matchesDoctorPattern(doc.name, rec.name)
+				recDept: bestFacility.rec.department,
+				facilityScore: bestFacility.scores.name,
+				individualScore: bestIndividual.scores.name
 			});
 			return {
 				status: 'EXACT',
-				mr8_id: (rec.id as any) ?? null,
-				scores,
-				diffs: buildDiffs(doc, rec),
+				mr8_id: (bestFacility.rec.id as any) ?? null,
+				scores: bestFacility.scores,
+				diffs: buildDiffs(doc, bestFacility.rec),
 				explanation: 'Exact match found.',
-				record: rec,
+				record: bestFacility.rec,
+			};
+		} else {
+			// Individual name match is better
+			logger.info('Exact individual name match found (preferred over facility)', {
+				docName: doc.name,
+				recName: bestIndividual.rec.name,
+				docDept: doc.department,
+				recDept: bestIndividual.rec.department,
+				facilityScore: bestFacility.scores.name,
+				individualScore: bestIndividual.scores.name
+			});
+			return {
+				status: 'EXACT',
+				mr8_id: (bestIndividual.rec.id as any) ?? null,
+				scores: bestIndividual.scores,
+				diffs: buildDiffs(doc, bestIndividual.rec),
+				explanation: 'Exact match found.',
+				record: bestIndividual.rec,
 			};
 		}
+	}
+	
+	// If we only have facility matches
+	if (facilityMatches.length > 0) {
+		// Return the best facility match
+		const bestFacility = facilityMatches.reduce((best, current) => {
+			const sumBest = best.scores.name + best.scores.address + (best.scores.department ?? 0);
+			const sumCurrent = current.scores.name + current.scores.address + (current.scores.department ?? 0);
+			return sumCurrent > sumBest ? current : best;
+		});
+		
+		logger.info('Exact facility match found (before department filtering)', {
+			docName: doc.name,
+			recName: bestFacility.rec.name,
+			docDept: doc.department,
+			recDept: bestFacility.rec.department,
+			doctorPatternMatch: matchesDoctorPattern(doc.name, bestFacility.rec.name)
+		});
+		return {
+			status: 'EXACT',
+			mr8_id: (bestFacility.rec.id as any) ?? null,
+			scores: bestFacility.scores,
+			diffs: buildDiffs(doc, bestFacility.rec),
+			explanation: 'Exact match found.',
+			record: bestFacility.rec,
+		};
+	}
+	
+	// If we only have individual name matches
+	if (individualNameMatches.length > 0) {
+		// Return the best individual name match
+		const bestIndividual = individualNameMatches.reduce((best, current) => {
+			const sumBest = best.scores.name + best.scores.address + (best.scores.department ?? 0);
+			const sumCurrent = current.scores.name + current.scores.address + (current.scores.department ?? 0);
+			return sumCurrent > sumBest ? current : best;
+		});
+		
+		logger.info('Exact individual name match found (before department filtering)', {
+			docName: doc.name,
+			recName: bestIndividual.rec.name,
+			docDept: doc.department,
+			recDept: bestIndividual.rec.department,
+			doctorPatternMatch: matchesDoctorPattern(doc.name, bestIndividual.rec.name)
+		});
+		return {
+			status: 'EXACT',
+			mr8_id: (bestIndividual.rec.id as any) ?? null,
+			scores: bestIndividual.scores,
+			diffs: buildDiffs(doc, bestIndividual.rec),
+			explanation: 'Exact match found.',
+			record: bestIndividual.rec,
+		};
 	}
 
 	// Step 2: If no exact match found, filter candidates by department for fuzzy matching

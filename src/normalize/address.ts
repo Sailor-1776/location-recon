@@ -209,10 +209,18 @@ export function normalizeAddress(block: string): CanonicalAddress {
 			const cleanedFacilityName = cleanNameLine(possibleFacilityName);
 			
 			if (cleanedFacilityName && looksLikeDoctorName) {
-				// We have both facility name and doctor name - prefer facility name for facility matching
+				// We have both facility name and doctor name - include both for matching
+				// This allows the matcher to check both facility name and individual doctor names
 				const hasDigitsInFacilityName = /[0-9]/.test(cleanedFacilityName);
-				if (!hasDigitsInFacilityName) {
+				const hasDigitsInName = /[0-9]/.test(cleanedPossibleName);
+				if (!hasDigitsInFacilityName && !hasDigitsInName) {
+					// Include facility name first, then individual names separated by semicolon
+					// This preserves both for matching purposes
+					name = `${cleanedFacilityName}; ${cleanedPossibleName}`;
+				} else if (!hasDigitsInFacilityName) {
 					name = cleanedFacilityName;
+				} else if (!hasDigitsInName) {
+					name = cleanedPossibleName;
 				}
 			} else if (looksLikeDoctorName && cleanedPossibleName) {
 				// Only doctor name present, use it

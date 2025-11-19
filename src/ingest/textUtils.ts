@@ -258,10 +258,10 @@ export function extractStructuredFacilities(text: string, pages?: PdfTextPage[])
 			};
 			
 			// Determine the facility name line
-			// Check if potentialNameLine looks like a doctor name (contains M.D., MD, D.O., DO, D.C., DC, etc.)
+			// Check if potentialNameLine looks like a doctor name (contains M.D., MD, D.O., DO, etc.)
 			// Clean the name line first to handle number prefixes
 			const cleanedPotentialName = cleanNameLine(potentialNameLine);
-			const looksLikeDoctorName = cleanedPotentialName && /,\s*(M\.?D\.?|D\.?O\.?|D\.?C\.?|P\.?A\.?|N\.?P\.?)/i.test(cleanedPotentialName);
+			const looksLikeDoctorName = cleanedPotentialName && /,\s*(M\.?D\.?|D\.?O\.?|P\.?A\.?|N\.?P\.?)/i.test(cleanedPotentialName);
 			
 			let nameLine: string;
 			let blockParts: string[];
@@ -388,8 +388,6 @@ function containsMedicalKeywords(block: string): boolean {
 		'md ',
 		'd.o.',
 		'do ',
-		'd.c.',
-		'dc ',
 		'p.a.',
 		'pa ',
 		'n.p.',
@@ -440,7 +438,6 @@ function containsMedicalKeywords(block: string): boolean {
 		'treatment',
 		'patient',
 		'provider',
-		'chiropractic',
 	];
 
 	const blockLower = block.toLowerCase();

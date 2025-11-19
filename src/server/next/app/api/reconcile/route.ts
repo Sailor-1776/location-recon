@@ -3,7 +3,7 @@ import { extractCandidateBlocks, extractStructuredFacilities, filterMedicalBlock
 import { normalizeAddress } from '../../../../../normalize/address';
 import { getDAO } from '../../../../../match/locationsDAO';
 import { loadConfig } from '../../../../../config';
-import { reconcileOne } from '../../../../../match/matcher';
+import { reconcileOne, reconcileMultipleNames } from '../../../../../match/matcher';
 import { canonicalKey } from '../../../../../types';
 import { getLogger } from '../../../../../utils/logger';
 import { isAddressExact, isNameExact } from '../../../../../match/scorers';
@@ -80,32 +80,76 @@ export async function POST(req: NextRequest) {
 				try {
 					const block = blockWithPos.block;
 					const canonical = normalizeAddress(block);
-					const match = await reconcileOne(canonical, dao);
-				const name_exact = !!(match.record && isNameExact(canonical.name, match.record.name));
-				const address_exact = !!(match.record && isAddressExact(canonical, match.record));
-				// Treat fuzzy EXACT as a found match (do not require strict equality)
-				const found = match.status === 'EXACT' && !!match.record;
-				const search_key =
-					found && match.record
-						? match.record.search_key ||
-						  canonicalKey({
-						  	name: match.record.name,
-						  	address1: match.record.address1,
-						  	city: match.record.city,
-						  	state: match.record.state,
-						  	postal_code: match.record.postal_code,
-						  })
-						: undefined;
-				results.push({
-					input: block.split(/\n/).slice(0, 3).join(' '),
-					parsed: canonical,
-					match,
-					outcome: found ? 'FOUND' : 'RESEARCH',
-					search_key,
-					name_exact,
-					address_exact,
-					note: found ? undefined : 'User needs to conduct research.',
-				});
+					
+					// Use reconcileMultipleNames to handle blocks with multiple names (semicolon-separated)
+					const matches = await reconcileMultipleNames(canonical, dao);
+					
+					// Process each match separately
+					for (const match of matches) {
+						const individualName = match.record ? match.record.name : canonical.name;
+						const individualCanonical = { ...canonical, name: individualName };
+						
+						const name_exact = !!(match.record && isNameExact(individualCanonical.name, match.record.name));
+						const address_exact = !!(match.record && isAddressExact(individualCanonical, match.record));
+						// Treat fuzzy EXACT as a found match (do not require strict equality)
+						const found = match.status === 'EXACT' && !!match.record;
+						
+						// Handle Non-Order departments
+						const departmentLower = match.record ? (match.record.department || '').toString().trim().toLowerCase() : '';
+						const isNonOrder = departmentLower === 'non-order';
+						
+						let search_key: string | undefined = undefined;
+						
+						if (isNonOrder && match.record) {
+							// For Non-Order departments, return search key with "-non" suffix
+							const baseSearchKey = match.record.search_key ||
+								canonicalKey({
+									name: match.record.name,
+									address1: match.record.address1,
+									city: match.record.city,
+									state: match.record.state,
+									postal_code: match.record.postal_code,
+								});
+							
+							// Append "-non" if not already present
+							search_key = baseSearchKey.endsWith('-non') ? baseSearchKey : `${baseSearchKey}-non`;
+							
+							// Extract search-key-like pattern from warning field and append to search_key
+							if (match.record.warning) {
+								try {
+									const extractedFromWarning = extractSearchKeyFromWarning(match.record.warning, search_key);
+									if (extractedFromWarning) {
+										// Append the extracted pattern to the right of SEARCHKEY-non
+										search_key = `${search_key} ${extractedFromWarning}`;
+									}
+								} catch (e: any) {
+									logger.warn('Failed to extract search key from warning', { error: e?.message });
+								}
+							}
+						} else if (found && match.record) {
+							// Regular match - return search key
+							search_key =
+								match.record.search_key ||
+								canonicalKey({
+									name: match.record.name,
+									address1: match.record.address1,
+									city: match.record.city,
+									state: match.record.state,
+									postal_code: match.record.postal_code,
+								});
+						}
+						
+						results.push({
+							input: block.split(/\n/).slice(0, 3).join(' '),
+							parsed: individualCanonical,
+							match,
+							outcome: found ? 'FOUND' : 'RESEARCH',
+							search_key,
+							name_exact,
+							address_exact,
+							note: found ? undefined : 'User needs to conduct research.',
+						});
+					}
 				} catch (e: any) {
 					logger.error('Failed to process text block', { message: e?.message, block: blockWithPos.block.substring(0, 100) });
 					// Continue processing other blocks
@@ -295,139 +339,148 @@ export async function POST(req: NextRequest) {
 					logger.info('Normalized address', {
 						normalized: ca
 					});
-					const match = await reconcileOne(ca, dao);
-					logger.info('Match result', {
-						blockPreview: block.substring(0, 50),
-						matchStatus: match.status,
-						hasRecord: !!match.record,
-						nameScore: match.scores?.name,
-						addressScore: match.scores?.address,
-						departmentScore: match.scores?.department,
-						recordName: match.record?.name,
-						recordDepartment: match.record?.department
-					});
-				const name_exact = !!(match.record && isNameExact(ca.name, match.record.name));
-				const address_exact = !!(match.record && isAddressExact(ca, match.record));
-				// Treat fuzzy EXACT or CLOSE as a found match (department already checked before fuzzy matching)
-				// Department filtering happens in reconcileOne before fuzzy matching, so if we get a match, department already matches
-				const found = (match.status === 'EXACT' || match.status === 'CLOSE') && !!match.record;
-				
-				// Check department first: if matched record's department is "Non-Order", return full warning text instead of search key
-				const matchedDepartment = match.record ? (match.record.department || '').toString().trim().toLowerCase() : '';
-				const isNonOrder = matchedDepartment === 'non-order';
-				
-				let warningMessage: string | undefined = undefined;
-				let search_key: string | undefined = undefined;
-				
-				if (isNonOrder && match.record) {
-					// Department column says "Non-Order": return search key with "-non" suffix
-					// First, get or generate the search key from the Search Key column
-					const baseSearchKey = match.record.search_key ||
-						canonicalKey({
-							name: match.record.name,
-							address1: match.record.address1,
-							city: match.record.city,
-							state: match.record.state,
-							postal_code: match.record.postal_code,
-						});
 					
-					// Append "-non" if not already present
-					search_key = baseSearchKey.endsWith('-non') ? baseSearchKey : `${baseSearchKey}-non`;
+					// Use reconcileMultipleNames to handle blocks with multiple names (semicolon-separated)
+					const matches = await reconcileMultipleNames(ca, dao);
 					
-					// Extract search-key-like pattern from warning field and append to search_key
-					if (match.record.warning) {
-						try {
-							const extractedFromWarning = extractSearchKeyFromWarning(match.record.warning, search_key);
-							if (extractedFromWarning) {
-								logger.info('Extracted search key pattern from warning', {
-									searchKey: search_key,
-									extractedFromWarning,
-									warning: match.record.warning.substring(0, 100)
-								});
-								// Append the extracted pattern to the right of SEARCHKEY-non
-								search_key = `${search_key} ${extractedFromWarning}`;
-							}
-						} catch (e: any) {
-							logger.warn('Failed to extract search key from warning', { error: e?.message });
-						}
-					}
-				} else if (found && match.record) {
-					// Department is not "Non-Order" and we have a match: return search key
-					// Return search key for both EXACT and CLOSE matches (department already verified in reconcileOne)
-					search_key =
-						match.record.search_key ||
-						canonicalKey({
-							name: match.record.name,
-							address1: match.record.address1,
-							city: match.record.city,
-							state: match.record.state,
-							postal_code: match.record.postal_code,
-						});
-				} else {
-					// No match found (NEW status or edge case): annotate with research required message
-					warningMessage = 'RESEARCH REQUIRED';
-				}
-				
-				// Track blocks for PDF annotation
-				if (isPdf && pdfFiles.length > 0) {
-					const pdfFile = pdfFiles[pdfFiles.length - 1];
-					// Only add blocks that have searchKey or warningMessage for annotation
-					if (search_key || warningMessage) {
-						logger.info('Adding block to PDF annotation', { 
-							blockIndex: blocks.indexOf(blockWithPos) + 1,
-							totalBlocks: blocks.length,
-							block: block, // Full block text
-							blockPreview: block.substring(0, 150),
-							searchKey: search_key,
-							warningMessage: warningMessage,
-							hasWarning: !!warningMessage,
-							matchStatus: match.status,
-							parsedName: ca.name,
-							parsedAddress: `${ca.address1}, ${ca.city}, ${ca.state} ${ca.postal_code}`,
-							hasPosition: blockWithPos.y > 0,
-							pageIndex: blockWithPos.pageIndex,
-							y: blockWithPos.y
-						});
-						// Include position data in the annotation block
-						pdfFile.blocks.push({ 
-							block, 
-							searchKey: search_key, 
-							warningMessage,
-							pageIndex: blockWithPos.pageIndex,
-							y: blockWithPos.y,
-							x: blockWithPos.x,
-							maxX: blockWithPos.maxX,
-							facilityNameLine: blockWithPos.facilityNameLine
-						});
-					} else {
-						logger.info('Skipping block (no searchKey or warningMessage)', { 
-							blockIndex: blocks.indexOf(blockWithPos) + 1,
-							totalBlocks: blocks.length,
-							block: block, // Full block text
-							blockPreview: block.substring(0, 150),
+					// Process each match separately
+					for (const match of matches) {
+						logger.info('Match result', {
+							blockPreview: block.substring(0, 50),
 							matchStatus: match.status,
 							hasRecord: !!match.record,
-							found: found,
-							isNonOrder: isNonOrder,
-							parsedName: ca.name,
-							parsedAddress: `${ca.address1}, ${ca.city}, ${ca.state} ${ca.postal_code}`
+							nameScore: match.scores?.name,
+							addressScore: match.scores?.address,
+							departmentScore: match.scores?.department,
+							recordName: match.record?.name,
+							recordDepartment: match.record?.department
+						});
+						
+						const individualName = match.record ? match.record.name : ca.name;
+						const individualCanonical = { ...ca, name: individualName };
+						
+						const name_exact = !!(match.record && isNameExact(individualCanonical.name, match.record.name));
+						const address_exact = !!(match.record && isAddressExact(individualCanonical, match.record));
+						// Treat fuzzy EXACT or CLOSE as a found match (department already checked before fuzzy matching)
+						// Department filtering happens in reconcileOne before fuzzy matching, so if we get a match, department already matches
+						const found = (match.status === 'EXACT' || match.status === 'CLOSE') && !!match.record;
+						
+						// Check department first: if matched record's department is "Non-Order", return full warning text instead of search key
+						const matchedDepartment = match.record ? (match.record.department || '').toString().trim().toLowerCase() : '';
+						const isNonOrder = matchedDepartment === 'non-order';
+						
+						let warningMessage: string | undefined = undefined;
+						let search_key: string | undefined = undefined;
+						
+						if (isNonOrder && match.record) {
+							// Department column says "Non-Order": return search key with "-non" suffix
+							// First, get or generate the search key from the Search Key column
+							const baseSearchKey = match.record.search_key ||
+								canonicalKey({
+									name: match.record.name,
+									address1: match.record.address1,
+									city: match.record.city,
+									state: match.record.state,
+									postal_code: match.record.postal_code,
+								});
+							
+							// Append "-non" if not already present
+							search_key = baseSearchKey.endsWith('-non') ? baseSearchKey : `${baseSearchKey}-non`;
+							
+							// Extract search-key-like pattern from warning field and append to search_key
+							if (match.record.warning) {
+								try {
+									const extractedFromWarning = extractSearchKeyFromWarning(match.record.warning, search_key);
+									if (extractedFromWarning) {
+										logger.info('Extracted search key pattern from warning', {
+											searchKey: search_key,
+											extractedFromWarning,
+											warning: match.record.warning.substring(0, 100)
+										});
+										// Append the extracted pattern to the right of SEARCHKEY-non
+										search_key = `${search_key} ${extractedFromWarning}`;
+									}
+								} catch (e: any) {
+									logger.warn('Failed to extract search key from warning', { error: e?.message });
+								}
+							}
+						} else if (found && match.record) {
+							// Department is not "Non-Order" and we have a match: return search key
+							// Return search key for both EXACT and CLOSE matches (department already verified in reconcileOne)
+							search_key =
+								match.record.search_key ||
+								canonicalKey({
+									name: match.record.name,
+									address1: match.record.address1,
+									city: match.record.city,
+									state: match.record.state,
+									postal_code: match.record.postal_code,
+								});
+						} else {
+							// No match found (NEW status or edge case): annotate with research required message
+							warningMessage = 'RESEARCH REQUIRED';
+						}
+						
+						// Track blocks for PDF annotation
+						if (isPdf && pdfFiles.length > 0) {
+							const pdfFile = pdfFiles[pdfFiles.length - 1];
+							// Only add blocks that have searchKey or warningMessage for annotation
+							if (search_key || warningMessage) {
+								logger.info('Adding block to PDF annotation', { 
+									blockIndex: blocks.indexOf(blockWithPos) + 1,
+									totalBlocks: blocks.length,
+									block: block, // Full block text
+									blockPreview: block.substring(0, 150),
+									searchKey: search_key,
+									warningMessage: warningMessage,
+									hasWarning: !!warningMessage,
+									matchStatus: match.status,
+									parsedName: individualCanonical.name,
+									parsedAddress: `${individualCanonical.address1}, ${individualCanonical.city}, ${individualCanonical.state} ${individualCanonical.postal_code}`,
+									hasPosition: blockWithPos.y > 0,
+									pageIndex: blockWithPos.pageIndex,
+									y: blockWithPos.y
+								});
+								// Include position data in the annotation block
+								pdfFile.blocks.push({ 
+									block, 
+									searchKey: search_key, 
+									warningMessage,
+									pageIndex: blockWithPos.pageIndex,
+									y: blockWithPos.y,
+									x: blockWithPos.x,
+									maxX: blockWithPos.maxX,
+									facilityNameLine: blockWithPos.facilityNameLine
+								});
+							} else {
+								logger.info('Skipping block (no searchKey or warningMessage)', { 
+									blockIndex: blocks.indexOf(blockWithPos) + 1,
+									totalBlocks: blocks.length,
+									block: block, // Full block text
+									blockPreview: block.substring(0, 150),
+									matchStatus: match.status,
+									hasRecord: !!match.record,
+									found: found,
+									isNonOrder: isNonOrder,
+									parsedName: individualCanonical.name,
+									parsedAddress: `${individualCanonical.address1}, ${individualCanonical.city}, ${individualCanonical.state} ${individualCanonical.postal_code}`
+								});
+							}
+						}
+						
+						// Add result for this individual match
+						results.push({
+							file: f.name,
+							input: block.split(/\n/).slice(0, 3).join(' '),
+							parsed: individualCanonical,
+							match,
+							outcome: found ? 'FOUND' : 'RESEARCH',
+							search_key,
+							name_exact,
+							address_exact,
+							note: found ? undefined : 'User needs to conduct research.',
 						});
 					}
-				}
-				
-				results.push(
-					{
-						file: f.name,
-						input: block.split(/\n/).slice(0, 3).join(' '),
-						parsed: ca,
-						match,
-						outcome: found ? 'FOUND' : 'RESEARCH',
-						search_key,
-						name_exact,
-						address_exact,
-						note: found ? undefined : 'User needs to conduct research.',
-					},
-				);
 				} catch (e: any) {
 					logger.error('Failed to process file block', { message: e?.message, file: f.name, block: blockWithPos.block.substring(0, 100) });
 					// Continue processing other blocks
@@ -507,21 +560,21 @@ export async function POST(req: NextRequest) {
 			}
 		}
 		
-				return NextResponse.json({ results, annotatedPdfs: Object.keys(annotatedPdfs).length > 0 ? annotatedPdfs : undefined });
-			} catch (e: any) {
-				logger.error('Reconcile route failed', { message: e?.message, stack: e?.stack, name: e?.name, cause: e?.cause });
-				// Ensure we always return JSON, not HTML
-				return NextResponse.json({ 
-					error: 'Internal Server Error',
-					message: e?.message || 'Unknown error',
-					stack: process.env.NODE_ENV === 'development' ? e?.stack : undefined
-				}, { 
-					status: 500,
-					headers: {
-						'Content-Type': 'application/json',
-					}
-				});
+		return NextResponse.json({ results, annotatedPdfs: Object.keys(annotatedPdfs).length > 0 ? annotatedPdfs : undefined });
+	} catch (e: any) {
+		logger.error('Reconcile route failed', { message: e?.message, stack: e?.stack, name: e?.name, cause: e?.cause });
+		// Ensure we always return JSON, not HTML
+		return NextResponse.json({ 
+			error: 'Internal Server Error',
+			message: e?.message || 'Unknown error',
+			stack: process.env.NODE_ENV === 'development' ? e?.stack : undefined
+		}, { 
+			status: 500,
+			headers: {
+				'Content-Type': 'application/json',
 			}
+		});
+	}
 		})();
 	} catch (e: any) {
 		// Catch any errors that happen during the async wrapper

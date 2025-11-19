@@ -42,6 +42,8 @@ export function expandAbbrev(s: string): string {
 		nw: 'northwest',
 		se: 'southeast',
 		sw: 'southwest',
+		// normalize British vs American spellings
+		centre: 'center',
 	};
 	return s
 		.toLowerCase()
@@ -123,6 +125,25 @@ export function computeGeodistanceIfBoth(
 }
 
 /**
+ * Extracts individual names from a string that may contain multiple names separated by semicolons.
+ * Examples:
+ * - "Ritesh Prasad, MD; Jared Crook, FNP-C." -> ["Ritesh Prasad, MD", "Jared Crook, FNP-C."]
+ * - "John Smith" -> ["John Smith"]
+ * - "East Texas Spine Institute, PA" -> ["East Texas Spine Institute, PA"]
+ */
+export function extractIndividualNames(name?: string | null): string[] {
+	if (!name) return [];
+	const trimmed = name.toString().trim();
+	if (!trimmed) return [];
+	
+	// Split by semicolon and clean each name
+	return trimmed
+		.split(';')
+		.map(n => n.trim())
+		.filter(n => n.length > 0);
+}
+
+/**
  * Extracts first and last name from a name string, removing titles and suffixes.
  * Examples:
  * - "Rafath Quraishi MD" -> { first: "Rafath", last: "Quraishi" }
@@ -159,27 +180,38 @@ export function extractFirstLastName(name?: string | null): { first: string; las
  * when compared to an input name.
  * Returns true if the CSV name starts with "Dr." (or "Doctor") followed by
  * the same first and last name as extracted from the input.
+ * Also handles multiple names separated by semicolons - checks if ANY of them match.
  */
 export function matchesDoctorPattern(inputName?: string | null, csvName?: string | null): boolean {
 	if (!inputName || !csvName) return false;
 	
-	const inputParts = extractFirstLastName(inputName);
-	if (!inputParts) return false;
+	// Extract individual names from input (handles semicolon-separated names)
+	const inputNames = extractIndividualNames(inputName);
 	
-	const csvLower = csvName.toString().trim().toLowerCase();
-	// Check if CSV name starts with "dr." or "doctor" (already lowercase)
-	if (!/^(dr\.?|doctor)\s+/.test(csvLower)) return false;
+	// Check each individual name
+	for (const individualInputName of inputNames) {
+		const inputParts = extractFirstLastName(individualInputName);
+		if (!inputParts) continue;
+		
+		const csvLower = csvName.toString().trim().toLowerCase();
+		// Check if CSV name starts with "dr." or "doctor" (already lowercase)
+		if (!/^(dr\.?|doctor)\s+/.test(csvLower)) continue;
+		
+		// Extract first/last from CSV name (after removing "Dr." prefix)
+		const csvWithoutPrefix = csvLower.replace(/^(dr\.?|doctor)\s+/, '').trim();
+		const csvParts = extractFirstLastName(csvWithoutPrefix);
+		if (!csvParts) continue;
+		
+		// Compare first and last names (case-insensitive)
+		if (
+			inputParts.first.toLowerCase() === csvParts.first.toLowerCase() &&
+			inputParts.last.toLowerCase() === csvParts.last.toLowerCase()
+		) {
+			return true;
+		}
+	}
 	
-	// Extract first/last from CSV name (after removing "Dr." prefix)
-	const csvWithoutPrefix = csvLower.replace(/^(dr\.?|doctor)\s+/, '').trim();
-	const csvParts = extractFirstLastName(csvWithoutPrefix);
-	if (!csvParts) return false;
-	
-	// Compare first and last names (case-insensitive)
-	return (
-		inputParts.first.toLowerCase() === csvParts.first.toLowerCase() &&
-		inputParts.last.toLowerCase() === csvParts.last.toLowerCase()
-	);
+	return false;
 }
 
 // Exact-match helpers for deterministic checks used by API routes/UX
@@ -187,6 +219,14 @@ export function isNameExact(a?: string | null, b?: string | null): boolean {
 	const aa = (a ?? '').toString().trim().toLowerCase();
 	const bb = (b ?? '').toString().trim().toLowerCase();
 	if (!aa || !bb) return false;
+	
+	// If input has multiple names (semicolon-separated), check if ANY of them match exactly
+	const individualNamesA = extractIndividualNames(aa);
+	if (individualNamesA.length > 1) {
+		// Check if any individual name matches
+		return individualNamesA.some(name => name === bb);
+	}
+	
 	return aa === bb;
 }
 
