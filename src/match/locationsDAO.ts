@@ -50,7 +50,7 @@ class MSSQLBackend implements LocationsDAO {
 			const result = await pool
 				.request()
 				.query(
-					'SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department FROM Locations',
+					'SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department, warning FROM Locations',
 				);
 			for (const row of result.recordset) {
 				yield fromRow(row);
@@ -71,7 +71,7 @@ class MSSQLBackend implements LocationsDAO {
 					.request()
 					.input('zip', blockingKey.postal_code.slice(0, 5))
 					.query(
-						'SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department FROM Locations WHERE postal_code LIKE @zip + \'%\'',
+						'SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department, warning FROM Locations WHERE postal_code LIKE @zip + \'%\'',
 					);
 				return result.recordset.map(fromRow);
 			}
@@ -80,7 +80,7 @@ class MSSQLBackend implements LocationsDAO {
 				.input('city', blockingKey.city)
 				.input('state', blockingKey.state)
 				.query(
-					'SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department FROM Locations WHERE city = @city AND state = @state',
+					'SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department, warning FROM Locations WHERE city = @city AND state = @state',
 				);
 			return result.recordset.map(fromRow);
 		} catch (e) {
@@ -117,7 +117,7 @@ class ODBCBackend implements LocationsDAO {
 		try {
 			const conn = await this.ensureConn();
 			const result = await conn.query(
-				'SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department FROM Locations',
+				'SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department, warning FROM Locations',
 			);
 			for (const row of result) {
 				yield fromRow(row);
@@ -135,14 +135,14 @@ class ODBCBackend implements LocationsDAO {
 			const conn = await this.ensureConn();
 			if (blockingKey.postal_code) {
 				const result = await conn.query(
-					`SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department
+					`SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department, warning
            FROM Locations WHERE postal_code LIKE ?`,
 					[`${blockingKey.postal_code.slice(0, 5)}%`],
 				);
 				return result.map(fromRow);
 			}
 			const result = await conn.query(
-				`SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department
+				`SELECT id, name, address1, address2, city, state, postal_code, country, latitude, longitude, search_key, department, warning
          FROM Locations WHERE city = ? AND state = ?`,
 				[blockingKey.city, blockingKey.state],
 			);
@@ -188,11 +188,22 @@ class CSVBackend implements LocationsDAO {
 	}): Promise<LocationRecord[]> {
 		const rows = await this.ensureLoaded();
 		if (blockingKey.postal_code) {
-			const zip5 = blockingKey.postal_code.slice(0, 5);
-			return rows.filter((r) => r.postal_code.slice(0, 5) === zip5);
+			const zip5 = blockingKey.postal_code.slice(0, 5).trim();
+			const postalMatches = rows.filter((r) => {
+				if (!r.postal_code || r.postal_code.trim() === '') return false;
+				return r.postal_code.slice(0, 5).trim() === zip5;
+			});
+			// If postal code matching found results, return them
+			if (postalMatches.length > 0) {
+				return postalMatches;
+			}
+			// Fall back to city/state if postal code match found nothing
+			// (handles cases where CSV has empty postal codes)
 		}
+		// Match by city and state
 		return rows.filter(
-			(r) => r.city.toLowerCase() === blockingKey.city.toLowerCase() && r.state === blockingKey.state,
+			(r) => r.city.toLowerCase().trim() === blockingKey.city.toLowerCase().trim() &&
+			        r.state.toUpperCase().trim() === blockingKey.state.toUpperCase().trim(),
 		);
 	}
 	async healthCheck(): Promise<{ ok: boolean; details: string }> {

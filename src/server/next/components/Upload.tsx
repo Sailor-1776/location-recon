@@ -34,7 +34,11 @@ export default function Upload() {
 		const data = new FormData(form);
 		try {
 			const res = await fetch('/api/reconcile', { method: 'POST', body: data });
-			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			if (!res.ok) {
+				const errorJson = await res.json().catch(() => ({}));
+				const errorMessage = errorJson.message || errorJson.error || `HTTP ${res.status}`;
+				throw new Error(errorMessage);
+			}
 			const json = await res.json();
 			setResults(json.results);
 		} catch (err: any) {

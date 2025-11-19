@@ -6,7 +6,7 @@ import { loadConfig } from '../config';
 import { getLogger } from '../utils/logger';
 import * as pdfReader from '../ingest/pdfReader';
 import * as emailReader from '../ingest/emailReader';
-import { extractCandidateBlocks } from '../ingest/textUtils';
+import { extractCandidateBlocks, filterMedicalBlocks } from '../ingest/textUtils';
 import { normalizeAddress } from '../normalize/address';
 import { getDAO } from '../match/locationsDAO';
 import { reconcileOne } from '../match/matcher';
@@ -24,7 +24,10 @@ export interface CLIOptions {
 
 async function readTextForFile(filePath: string): Promise<string> {
 	const ext = path.extname(filePath).toLowerCase();
-	if (ext === '.pdf') return pdfReader.extractText(filePath);
+	if (ext === '.pdf') {
+		const extraction = await pdfReader.extractText(filePath);
+		return extraction.text;
+	}
 	if (ext === '.eml' || ext === '.msg') return emailReader.extractText(filePath);
 	// default: text
 	return fsp.readFile(filePath, 'utf8');
@@ -68,7 +71,7 @@ export async function runCli(argv: string[]): Promise<number> {
 	const outFmt = (opts.format as Format) || 'jsonl';
 	const writer = process.stdout;
 
-	let fileTexts: Array<{ file: string; text: string }> = [];
+	const fileTexts: Array<{ file: string; text: string }> = [];
 	if (opts.input === '-') {
 		const buf = await fsp.readFile(0, 'utf8');
 		fileTexts.push({ file: '<stdin>', text: buf });
@@ -83,7 +86,9 @@ export async function runCli(argv: string[]): Promise<number> {
 	const printedKeys = new Set<string>();
 	let total = 0;
 	for (const { file, text } of fileTexts) {
-		const blocks = extractCandidateBlocks(text);
+		let blocks = extractCandidateBlocks(text);
+		// Filter blocks to only include those with medical/healthcare keywords
+		blocks = filterMedicalBlocks(blocks);
 		for (const block of blocks.slice(0, opts.limit || blocks.length)) {
 			const ca = normalizeAddress(block);
 			const match = await reconcileOne(ca, dao);

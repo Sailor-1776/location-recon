@@ -11,6 +11,7 @@ import {
 	fullDbAddressString,
 	isAddressExact,
 	isNameExact,
+	matchesDoctorPattern,
 	tokenSet,
 	tokenSort,
 } from './scorers';
@@ -30,24 +31,125 @@ export interface MatchResult {
 	record?: LocationRecord | null;
 }
 
+/**
+ * Normalizes department names to canonical forms to handle common variations.
+ * Examples:
+ * - "Radiology Records", "Radiology Dept.", "Radiology Department" -> "radiology"
+ * - "Medical Records", "Medical Record Department" -> "medical records"
+ * - "Billing Records", "Billing Department", "Billing" -> "billing"
+ * - "Patient Accounts", "Patient Account Department" -> "patient accounts"
+ */
+function normalizeDepartment(dept: string): string {
+	if (!dept) return '';
+	
+	const normalized = dept.toLowerCase().trim();
+	
+	// Remove common suffixes/prefixes and normalize abbreviations
+	const cleaned = normalized
+		.replace(/\b(dept|dept\.|department)\b/g, '')
+		.replace(/\b(records?|record)\b/g, '')
+		.trim();
+	
+	// Map core department names to canonical forms
+	const coreMappings: Record<string, string> = {
+		'radiology': 'radiology',
+		'medical': 'medical records',
+		'billing': 'billing',
+		'patient account': 'patient accounts',
+		'patient accounts': 'patient accounts',
+		'record': 'records department',
+		'records': 'records department',
+		'legal': 'legal department',
+		'human resource': 'human resources',
+		'human resources': 'human resources',
+		'hr': 'human resources',
+		'pharmacy': 'pharmacy',
+	};
+	
+	// Check for exact match in core mappings
+	if (coreMappings[cleaned]) {
+		return coreMappings[cleaned];
+	}
+	
+	// Check if cleaned string contains any core department name
+	for (const [key, value] of Object.entries(coreMappings)) {
+		if (cleaned.includes(key) || normalized.includes(key)) {
+			return value;
+		}
+	}
+	
+	// Special handling for common patterns
+	if (normalized.includes('radiology')) {
+		return 'radiology';
+	}
+	if (normalized.includes('medical') && (normalized.includes('record') || normalized.includes('records'))) {
+		return 'medical records';
+	}
+	if (normalized.includes('billing')) {
+		return 'billing';
+	}
+	if (normalized.includes('patient') && (normalized.includes('account') || normalized.includes('accounts'))) {
+		return 'patient accounts';
+	}
+	if (normalized.includes('record') || normalized.includes('records')) {
+		if (!normalized.includes('medical') && !normalized.includes('billing') && !normalized.includes('radiology')) {
+			return 'records department';
+		}
+	}
+	if (normalized.includes('legal')) {
+		return 'legal department';
+	}
+	if (normalized.includes('human resource') || normalized.includes('hr')) {
+		return 'human resources';
+	}
+	if (normalized.includes('pharmacy')) {
+		return 'pharmacy';
+	}
+	
+	// If no mapping found, return normalized version
+	return normalized;
+}
+
 function computeScores(
 	doc: CanonicalAddress,
 	db: LocationRecord,
 ): { name: number; address: number; department: number | null; geodistance_m: number | null } {
 	const nameA = (doc.name || '').toString();
 	const nameB = db.name || '';
-	const name = fuzzball.token_sort_ratio(nameA, nameB);
+	
+	// Check for doctor pattern match first (e.g., "Rafath Quraishi MD" matches "Dr. Rafath Quraishi")
+	// If it matches, boost the score significantly
+	let name: number;
+	if (matchesDoctorPattern(nameA, nameB)) {
+		// Give a high score (98) for doctor pattern matches
+		name = 98;
+	} else {
+		// Otherwise use standard fuzzy matching
+		name = fuzzball.token_sort_ratio(nameA, nameB);
+	}
+	
 	const addrA = expandAbbrev(fullAddressString(doc));
 	const addrB = expandAbbrev(fullDbAddressString(db));
 	const address = fuzzball.token_set_ratio(addrA, addrB);
 	
 	// Compute department score if both have department values
 	let department: number | null = null;
-	const docDept = (doc.department || '').toString().trim().toLowerCase();
-	const dbDept = (db.department || '').toString().trim().toLowerCase();
-	if (docDept && dbDept) {
-		department = fuzzball.token_sort_ratio(docDept, dbDept);
-	} else if (!docDept && !dbDept) {
+	const docDept = (doc.department || '').toString().trim();
+	const dbDept = (db.department || '').toString().trim();
+	
+	// Normalize both department names to canonical forms
+	const normalizedDocDept = normalizeDepartment(docDept);
+	const normalizedDbDept = normalizeDepartment(dbDept);
+	
+	if (normalizedDocDept && normalizedDbDept) {
+		// If normalized forms match exactly, give perfect score
+		if (normalizedDocDept === normalizedDbDept) {
+			department = 100;
+		} else {
+			// Otherwise use fuzzy matching
+			department = fuzzball.token_sort_ratio(normalizedDocDept, normalizedDbDept);
+		}
+	} else if (!normalizedDocDept && !normalizedDbDept) {
 		// Both missing - consider it a match (neutral)
 		department = 100;
 	} else {
@@ -92,14 +194,25 @@ function buildDiffs(doc: CanonicalAddress, db: LocationRecord): MatchResult['dif
 }
 
 function departmentsMatch(doc: CanonicalAddress, rec: LocationRecord): boolean {
-	const docDept = (doc.department || '').toString().trim().toLowerCase();
-	const recDept = (rec.department || '').toString().trim().toLowerCase();
-	// If both have departments, they must match exactly
-	if (docDept && recDept) {
-		return docDept === recDept;
+	const docDept = (doc.department || '').toString().trim();
+	const recDept = (rec.department || '').toString().trim();
+	
+	// Normalize both department names to canonical forms
+	const normalizedDocDept = normalizeDepartment(docDept);
+	const normalizedRecDept = normalizeDepartment(recDept);
+	
+	// If both have departments, check for match
+	if (normalizedDocDept && normalizedRecDept) {
+		// First try exact match after normalization
+		if (normalizedDocDept === normalizedRecDept) {
+			return true;
+		}
+		// Fallback to fuzzy matching with a threshold (85% similarity) for edge cases
+		const similarity = fuzzball.token_sort_ratio(normalizedDocDept, normalizedRecDept);
+		return similarity >= 85;
 	}
 	// If both are missing, consider it a match
-	if (!docDept && !recDept) {
+	if (!normalizedDocDept && !normalizedRecDept) {
 		return true;
 	}
 	// If one has department and the other doesn't, no match
@@ -107,39 +220,76 @@ function departmentsMatch(doc: CanonicalAddress, rec: LocationRecord): boolean {
 }
 
 export async function reconcileOne(doc: CanonicalAddress, dao: LocationsDAO): Promise<MatchResult> {
+	const logger = getLogger();
 	const blockingKey = doc.postal_code
 		? { city: doc.city, state: doc.state, postal_code: doc.postal_code.slice(0, 5) }
 		: { city: doc.city, state: doc.state };
+	
+	logger.info('Finding candidates', {
+		blockingKey,
+		docName: doc.name,
+		docDepartment: doc.department
+	});
+	
 	const allCandidates = await dao.findCandidates(blockingKey);
-	
-	// Step 1: Filter candidates by department first
-	// If doc has a department (non-empty), only consider records with matching department
-	// If doc has no department, consider all candidates
-	const docHasDepartment = doc.department && doc.department.toString().trim().length > 0;
-	const departmentFiltered = docHasDepartment
-		? allCandidates.filter((rec) => departmentsMatch(doc, rec))
-		: allCandidates;
-	
-	// Step 2: Check for exact matches (name and address) within department-filtered candidates
-	for (const rec of departmentFiltered) {
-		const nameExact = isNameExact(doc.name, rec.name);
+
+	logger.info('Found candidates', {
+		candidatesCount: allCandidates.length,
+		sampleNames: allCandidates.slice(0, 5).map(c => c.name)
+	});
+
+	// Step 1: Check for exact matches (name and address) FIRST, before department filtering
+	// Exact matches should always be returned regardless of department differences
+	// Also check for doctor pattern matches (e.g., "Rafath Quraishi MD" matches "Dr. Rafath Quraishi")
+	for (const rec of allCandidates) {
+		const nameExact = isNameExact(doc.name, rec.name) || matchesDoctorPattern(doc.name, rec.name);
 		const addressExact = isAddressExact(doc, rec);
-		
+
 		if (nameExact && addressExact) {
-			// Found exact match within department - return immediately
+			// Found exact match - return immediately (department doesn't matter for exact matches)
 			const scores = computeScores(doc, rec);
+			logger.info('Exact match found (before department filtering)', {
+				docName: doc.name,
+				recName: rec.name,
+				docDept: doc.department,
+				recDept: rec.department,
+				doctorPatternMatch: matchesDoctorPattern(doc.name, rec.name)
+			});
 			return {
 				status: 'EXACT',
 				mr8_id: (rec.id as any) ?? null,
 				scores,
 				diffs: buildDiffs(doc, rec),
-				explanation: 'Exact match found within department.',
+				explanation: 'Exact match found.',
 				record: rec,
 			};
 		}
 	}
+
+	// Step 2: If no exact match found, filter candidates by department for fuzzy matching
+	// If doc has a department (non-empty), only consider records with matching department
+	// If doc has no department, consider all candidates
+	const docHasDepartment = doc.department && doc.department.toString().trim().length > 0;
+	const departmentFiltered = docHasDepartment
+		? allCandidates.filter((rec) => {
+			const matches = departmentsMatch(doc, rec);
+			logger.debug('Department match check', {
+				docDept: doc.department,
+				recDept: rec.department,
+				recName: rec.name,
+				matches
+			});
+			return matches;
+		})
+		: allCandidates;
+
+	logger.info('After department filtering', {
+		docHasDepartment,
+		departmentFilteredCount: departmentFiltered.length,
+		filteredNames: departmentFiltered.slice(0, 5).map(c => ({ name: c.name, dept: c.department }))
+	});
 	
-	// Step 3: If no exact match found, proceed with scoring logic
+	// Step 3: If no exact match found, proceed with scoring logic for fuzzy matches
 	let best: { rec: LocationRecord; scores: MatchResult['scores'] } | null = null;
 
 	for (const rec of departmentFiltered) {
@@ -167,7 +317,6 @@ export async function reconcileOne(doc: CanonicalAddress, dao: LocationsDAO): Pr
 	const status = decideStatus(best.scores);
 	
 	// Debug logging for matching issues
-	const logger = getLogger();
 	if (status !== 'EXACT') {
 		logger.info('Match result', {
 			status,

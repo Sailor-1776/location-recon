@@ -31,6 +31,8 @@ type Message = {
 	content: string;
 	files?: File[];
 	results?: Result[];
+	annotatedPdf?: { blob: Blob; filename: string };
+	annotatedPdfs?: Record<string, string>; // base64 encoded PDFs
 	timestamp: Date;
 };
 
@@ -84,7 +86,7 @@ export default function ChatInterface() {
 		setAttachedFiles(prev => prev.filter((_, i) => i !== index));
 	};
 
-	const processFiles = async (files: File[], text?: string) => {
+	const processFiles = async (files: File[], text?: string): Promise<{ results: Result[]; annotatedPdf?: { blob: Blob; filename: string }; annotatedPdfs?: Record<string, string> }> => {
 		const formData = new FormData();
 		files.forEach(file => formData.append('files', file));
 		if (text?.trim()) {
@@ -93,9 +95,52 @@ export default function ChatInterface() {
 
 		try {
 			const res = await fetch('/api/reconcile', { method: 'POST', body: formData });
-			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			if (!res.ok) {
+				// Always try to extract error message from response
+				let errorMessage = `HTTP ${res.status}`;
+				try {
+					const errorText = await res.text();
+					console.error('API Error Response:', { status: res.status, statusText: res.statusText, text: errorText });
+					if (errorText) {
+						try {
+							const errorJson = JSON.parse(errorText);
+							errorMessage = errorJson.message || errorJson.error || errorMessage;
+							console.error('Parsed error JSON:', errorJson);
+						} catch (parseError) {
+							// If not JSON, use the text as error message if it's reasonable
+							const trimmed = errorText.trim();
+							if (trimmed && trimmed.length < 500) {
+								errorMessage = trimmed;
+							}
+						}
+					}
+				} catch (readError) {
+					console.error('Failed to read error response:', readError);
+					// If we can't read the response, use the status code
+				}
+				throw new Error(errorMessage);
+			}
+			
+			// Check if response is a PDF (single PDF file uploaded)
+			const contentType = res.headers.get('content-type');
+			if (contentType && contentType.toLowerCase().includes('application/pdf')) {
+				const blob = await res.blob();
+				const contentDisposition = res.headers.get('content-disposition');
+				const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+				const filename = filenameMatch ? filenameMatch[1] : 'annotated.pdf';
+				
+				return {
+					results: [],
+					annotatedPdf: { blob, filename },
+				};
+			}
+			
+			// Otherwise, it's JSON
 			const json = await res.json();
-			return json.results || [];
+			return {
+				results: json.results || [],
+				annotatedPdfs: json.annotatedPdfs,
+			};
 		} catch (err: any) {
 			throw new Error(err?.message || 'Processing failed');
 		}
@@ -119,11 +164,34 @@ export default function ChatInterface() {
 		setIsProcessing(true);
 
 		try {
-			const results = await processFiles(attachedFiles, inputText);
+			const response = await processFiles(attachedFiles, inputText);
+
+			// Handle single PDF response
+			if (response.annotatedPdf) {
+				// Create download link
+				const url = URL.createObjectURL(response.annotatedPdf.blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = response.annotatedPdf.filename;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				URL.revokeObjectURL(url);
+				
+				const assistantMessage: Message = {
+					id: (Date.now() + 1).toString(),
+					type: 'assistant',
+					content: `I've processed your PDF and annotated it with search keys. The annotated PDF has been downloaded.`,
+					annotatedPdf: response.annotatedPdf,
+					timestamp: new Date(),
+				};
+				setMessages(prev => [...prev, assistantMessage]);
+				return;
+			}
 
 			// For text-only inputs, return simplified output per exercise:
 			if (attachedFiles.length === 0) {
-				const lines = (results as Result[]).map((r) => {
+				const lines = (response.results as Result[]).map((r) => {
 					const p = r.parsed;
 					const name = p.name ? `${p.name} — ` : '';
 					const addr2 = p.address2 ? `, ${p.address2}` : '';
@@ -142,13 +210,35 @@ export default function ChatInterface() {
 				return;
 			}
 
+			// Handle multiple files with annotated PDFs
+			if (response.annotatedPdfs && Object.keys(response.annotatedPdfs).length > 0) {
+				// Create download links for each annotated PDF
+				for (const [filename, base64] of Object.entries(response.annotatedPdfs)) {
+					const binaryString = atob(base64);
+					const bytes = new Uint8Array(binaryString.length);
+					for (let i = 0; i < binaryString.length; i++) {
+						bytes[i] = binaryString.charCodeAt(i);
+					}
+					const blob = new Blob([bytes], { type: 'application/pdf' });
+					const url = URL.createObjectURL(blob);
+					const a = document.createElement('a');
+					a.href = url;
+					a.download = filename;
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+					URL.revokeObjectURL(url);
+				}
+			}
+
 			const assistantMessage: Message = {
 				id: (Date.now() + 1).toString(),
 				type: 'assistant',
-				content: results.length > 0
-					? `I've processed your files and found ${results.length} location${results.length !== 1 ? 's' : ''}.`
+				content: response.results.length > 0
+					? `I've processed your files and found ${response.results.length} location${response.results.length !== 1 ? 's' : ''}.${response.annotatedPdfs && Object.keys(response.annotatedPdfs).length > 0 ? ' Annotated PDFs have been downloaded.' : ''}`
 					: 'No locations were found in your input.',
-				results: results.length > 0 ? results : undefined,
+				results: response.results.length > 0 ? response.results : undefined,
+				annotatedPdfs: response.annotatedPdfs,
 				timestamp: new Date(),
 			};
 
@@ -209,6 +299,19 @@ export default function ChatInterface() {
 												📎 {file.name}
 											</div>
 										))}
+									</div>
+								)}
+
+								{/* Annotated PDF Download Link */}
+								{message.annotatedPdf && (
+									<div className="mt-4 w-[1000px] max-w-[80vw]">
+										<a
+											href={URL.createObjectURL(message.annotatedPdf.blob)}
+											download={message.annotatedPdf.filename}
+											className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+										>
+											📄 Download Annotated PDF: {message.annotatedPdf.filename}
+										</a>
 									</div>
 								)}
 
